@@ -5,12 +5,12 @@ import mysql.connector
 from datetime import datetime
 import bcrypt
 
-
 app = FastAPI()
 
+# CORS middleware para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ajuste para domínio do frontend em produção
+    allow_origins=["*"],  # Ajustar para produção
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,12 +24,14 @@ def get_db_connection():
         database="almoxarifado1"
     )
 
+# --- ROTAS PRODUTOS ---
+
 @app.post("/produtos")
 def criar_produto(
     nome: str = Form(...),
     id_categoria: int = Form(...),
     quantidade_inicial: int = Form(...),
-    ultima_alteracao: Optional[str] = Form(None)  # receber como string opcional
+    ultima_alteracao: Optional[str] = Form(None)
 ):
     db = get_db_connection()
     cursor = db.cursor()
@@ -37,7 +39,7 @@ def criar_produto(
     # Converter string para datetime ou usar data atual
     if ultima_alteracao:
         try:
-            data_alt = datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")  # formato do input datetime-local HTML
+            data_alt = datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")
         except ValueError:
             raise HTTPException(status_code=400, detail="Formato de data inválido")
     else:
@@ -48,13 +50,12 @@ def criar_produto(
     valores = (nome, quantidade_inicial, id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"))
     cursor.execute(sql, valores)
 
-    # Obter ID do produto inserido para movimentação
     produto_id = cursor.lastrowid
 
     # Registrar movimentação (Entrada)
     sql_mov = """
-    INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) 
-    VALUES ('Entrada', %s, %s, %s, %s)
+        INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) 
+        VALUES ('Entrada', %s, %s, %s)
     """
     valores_mov = (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
     cursor.execute(sql_mov, valores_mov)
@@ -63,7 +64,6 @@ def criar_produto(
     cursor.close()
     db.close()
     return {"mensagem": "Produto inserido com sucesso!"}
-
 
 @app.put("/produtos/{produto_id}")
 def atualizar_produto(
@@ -84,9 +84,9 @@ def atualizar_produto(
         data_alt = datetime.now()
 
     sql = """
-    UPDATE produtos 
-    SET nome = UPPER(%s), id_categoria = %s, ultima_alteracao = %s
-    WHERE id = %s
+        UPDATE produtos 
+        SET nome = UPPER(%s), id_categoria = %s, ultima_alteracao = %s
+        WHERE id = %s
     """
     valores = (nome, id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
     cursor.execute(sql, valores)
@@ -96,6 +96,15 @@ def atualizar_produto(
     db.close()
     return {"mensagem": "Produto atualizado com sucesso!"}
 
+@app.delete("/produtos/{produto_id}")
+def excluir_produto(produto_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM produtos WHERE id = %s", (produto_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    return {"mensagem": "Produto excluído com sucesso!"}
 
 @app.get("/produtos")
 def listar_produtos(
@@ -103,7 +112,7 @@ def listar_produtos(
     order_dir: str = Query("asc", regex="^(asc|desc)$"),
     busca: Optional[str] = None,
     categoria_id: Optional[int] = Query(None),
-    data: Optional[str] = Query(None)  # novo parâmetro data
+    data: Optional[str] = Query(None)
 ):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -148,6 +157,8 @@ def listar_produtos(
     db.close()
     return produtos
 
+# --- ROTAS CATEGORIAS ---
+
 @app.get("/categorias")
 def listar_categorias():
     db = get_db_connection()
@@ -158,41 +169,7 @@ def listar_categorias():
     db.close()
     return categorias
 
-
-
-@app.put("/produtos/{produto_id}")
-def atualizar_produto(
-    produto_id: int,
-    nome: str = Form(...),
-    id_categoria: int = Form(...)
-):
-    db = get_db_connection()
-    cursor = db.cursor()
-    sql = """
-    UPDATE produtos 
-    SET nome = Upper(%s), id_categoria = %s
-    WHERE id = %s
-    """
-    valores = (nome, id_categoria, produto_id)
-    cursor.execute(sql, valores)
-
-    db.commit()
-    cursor.close()
-    db.close()
-    return {"mensagem": "Produto atualizado com sucesso!"}
-
-
-
-@app.delete("/produtos/{produto_id}")
-def excluir_produto(produto_id: int):
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM produtos WHERE id = %s", (produto_id,))
-    db.commit()
-    cursor.close()
-    db.close()
-    return {"mensagem": "Produto excluído com sucesso!"}
-
+# --- ROTAS LOGIN ---
 
 @app.post("/login")
 def login(username: str = Form(...), senha: str = Form(...)):
@@ -208,7 +185,7 @@ def login(username: str = Form(...), senha: str = Form(...)):
 
     return {"mensagem": "Login realizado com sucesso!"}
 
-
+# --- ROTAS MOVIMENTAÇÕES ---
 
 @app.get("/movimentacoes")
 def listar_movimentacoes():

@@ -22,7 +22,7 @@
   </header>
 
   <nav class="sidebar">
-    <a href="TEMPORARIO/dashboard2.html" class="active">Início</a>
+    <a href="#" class="active">Início</a>
     <a href="TEMPORARIO/estoque.html">Estoque</a>
     <a href="TEMPORARIO/cadastrarProduto.html">Cadastrar Produto</a>
     <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
@@ -33,18 +33,16 @@
   </nav>
 
   <main class="main-content">
-
-<section class="content-section">
-  <h2>Últimas Movimentações</h2>
-  <div class="movimentacao-list product-list">
-    <!-- Conteúdo dinâmico via JS -->
-  </div>
-</section>
-
-   
+    <section class="content-section">
+      <h2>Últimas Movimentações</h2>
+      <div class="movimentacao-list product-list">
+        <!-- Conteúdo dinâmico via JS -->
+      </div>
+    </section>
 
     <aside class="calendar">
       <h3>Calendário</h3>
+      <!-- Removi o segundo #data-atual duplicado -->
       <div id="data-atual" style="margin-bottom:10px; font-weight:600;"></div>
 
       <div class="filter-group">
@@ -68,8 +66,7 @@
           <option value="Cosméticos">Cosméticos</option>
         </select>
       </div>
-      
-      <div id="data-atual" style="margin-bottom: 10px; font-weight: 600;"></div>
+
       <div id="calendar"></div>
     </aside>
   </main>
