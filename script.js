@@ -311,32 +311,12 @@ if (document.getElementById("tabela-produtos")) {
     }
 
 
-document.addEventListener('DOMContentLoaded', function () {
+
+if (document.getElementById("calendar")) {
   const calendarEl = document.getElementById('calendar');
   const dataAtualEl = document.getElementById('data-atual');
   const filtroProduto = document.getElementById('filtroProduto');
   const filtroCategoria = document.getElementById('filtroCategoria');
-
-  const eventosOriginais = [
-    { title: 'Produto A - Higiene', date: '2025-05-08', color: '#2ecc71' },
-    { title: 'Produto B - Alimentos', date: '2025-05-07', color: '#3498db' },
-    { title: 'Produto C - Cosméticos', date: '2025-05-06', color: '#9b59b6' },
-    { title: 'Produto D - Higiene', date: '2025-05-05', color: '#2ecc71' },
-    { title: 'Produto E - Alimentos', date: '2025-05-04', color: '#3498db' }
-  ];
-
-  function filtrarEventos() {
-    const produtoSelecionado = filtroProduto.value;
-    const categoriaSelecionada = filtroCategoria.value;
-
-    return eventosOriginais.filter(ev => {
-      const [produto, categoria] = ev.title.split(' - ');
-      return (
-        (!produtoSelecionado || produto === produtoSelecionado) &&
-        (!categoriaSelecionada || categoria === categoriaSelecionada)
-      );
-    });
-  }
 
   const hoje = new Date().toISOString().split('T')[0];
   const eventosHoje = [{
@@ -381,7 +361,12 @@ document.addEventListener('DOMContentLoaded', function () {
       calendar.addEventSource([...filtrarEventos(), ...eventosHoje]);
     })
   );
-});
+};
+
+  carregarMovimentacoes();
+}
+
+
 
 
 
@@ -436,4 +421,4 @@ carregarMovimentacoes();
         configurarOrdenacao();
         carregarProdutos();
     };
-}
+{}
