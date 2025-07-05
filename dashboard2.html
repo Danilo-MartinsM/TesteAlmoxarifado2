@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Início - naturAYO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
+  <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <img src="imagens/logo1.png" alt="Logo naturAYO" />
+      <h1>naturAYO</h1>
+    </div>
+    <div class="user-info">
+      <img src="imagens/foto-perfil.jpg" alt="Foto do usuário" />
+      <span>Usuário: Danilo Martins</span>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <a href="dashboard2.html" class="active">Início</a>
+    <a href="estoque.html">Estoque</a>
+    <a href="cadastrarProduto.html">Cadastrar Produto</a>
+    <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
+    <a href="cadastrarSaidas.html">Cadastrar Saídas</a>
+    <a href="relatorios.html">Relatórios</a>
+    <a href="configuracoes.html">Configurações</a>
+    <a href="ajuda.html">Ajuda</a>
+  </nav>
+
+  <main class="main-content">
+    <section class="content-section">
+      <div class="current-date">
+        <h2 id="data-atual">Hoje: </h2>
+      </div>
+
+      <h2>Últimos Produtos Cadastrados</h2>
+      <div class="product-list">
+        <div class="product-item">
+          <div class="product-icon">📦</div>
+          <div>
+            <strong>Produto A</strong><br />
+            <small>10 unidades</small><br />
+            <small>Cadastrado em: 08/05/2025</small>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="product-icon">📦</div>
+          <div>
+            <strong>Produto B</strong><br />
+            <small>5 unidades</small><br />
+            <small>Cadastrado em: 07/05/2025</small>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="product-icon">📦</div>
+          <div>
+            <strong>Produto C</strong><br />
+            <small>20 unidades</small><br />
+            <small>Cadastrado em: 06/05/2025</small>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="product-icon">📦</div>
+          <div>
+            <strong>Produto D</strong><br />
+            <small>8 unidades</small><br />
+            <small>Cadastrado em: 05/05/2025</small>
+          </div>
+        </div>
+        <div class="product-item">
+          <div class="product-icon">📦</div>
+          <div>
+            <strong>Produto E</strong><br />
+            <small>12 unidades</small><br />
+            <small>Cadastrado em: 04/05/2025</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="calendar">
+      <h3>Calendário</h3>
+
+      <div class="filter-group">
+        <label for="filtroProduto">Filtrar por Produto:</label>
+        <select id="filtroProduto">
+          <option value="">Todos</option>
+          <option value="Produto A">Produto A</option>
+          <option value="Produto B">Produto B</option>
+          <option value="Produto C">Produto C</option>
+          <option value="Produto D">Produto D</option>
+          <option value="Produto E">Produto E</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroCategoria">Filtrar por Categoria:</label>
+        <select id="filtroCategoria">
+          <option value="">Todas</option>
+          <option value="Higiene">Higiene</option>
+          <option value="Alimentos">Alimentos</option>
+          <option value="Cosméticos">Cosméticos</option>
+        </select>
+      </div>
+
+      <div id="calendar"></div>
+    </aside>
+  </main>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const dataAtualEl = document.getElementById('data-atual');
+      const filtroProduto = document.getElementById('filtroProduto');
+      const filtroCategoria = document.getElementById('filtroCategoria');
+
+      const eventosOriginais = [
+        { title: 'Produto A - Higiene', date: '2025-05-08', color: '#2ecc71' },   // Verde
+        { title: 'Produto B - Alimentos', date: '2025-05-07', color: '#3498db' }, // Azul
+        { title: 'Produto C - Cosméticos', date: '2025-05-06', color: '#9b59b6' },// Roxo
+        { title: 'Produto D - Higiene', date: '2025-05-05', color: '#2ecc71' },
+        { title: 'Produto E - Alimentos', date: '2025-05-04', color: '#3498db' }
+      ];
+
+      function filtrarEventos() {
+        const produtoSelecionado = filtroProduto.value;
+        const categoriaSelecionada = filtroCategoria.value;
+
+        return eventosOriginais.filter(ev => {
+          const [produto, categoria] = ev.title.split(' - ');
+          return (
+            (!produtoSelecionado || produto === produtoSelecionado) &&
+            (!categoriaSelecionada || categoria === categoriaSelecionada)
+          );
+        });
+      }
+
+      // Destaque do dia atual
+      const hoje = new Date().toISOString().split('T')[0];
+      const eventosHoje = [{
+        title: 'Hoje',
+        date: hoje,
+        display: 'background',
+        backgroundColor: '#ffeaa7' // amarelo claro
+      }];
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        events: [...filtrarEventos(), ...eventosHoje],
+        dateClick: function (info) {
+          const selectedDate = info.date.toISOString().split('T')[0];
+          if (selectedDate === hoje) {
+            dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
+              day: '2-digit', month: 'long', year: 'numeric'
+            });
+          } else {
+            dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
+              day: '2-digit', month: 'long', year: 'numeric'
+            });
+          }
+          document.querySelectorAll('.fc-day').forEach(day => {
+            day.classList.remove('fc-day-selected');
+          });
+
+          info.dayEl.classList.add('fc-day-selected');
+        }
+      });
+
+      calendar.render();
+
+      dataAtualEl.textContent = 'Hoje: ' + new Date().toLocaleDateString('pt-BR', {
+        day: '2-digit', month: 'long', year: 'numeric'
+      });
+
+      [filtroProduto, filtroCategoria].forEach(filtro =>
+        filtro.addEventListener('change', () => {
+          calendar.removeAllEvents();
+          calendar.addEventSource([...filtrarEventos(), ...eventosHoje]);
+        })
+      );
+    });
+  </script>
+</body>
+</html>

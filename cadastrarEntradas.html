@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Entradas - naturAYO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
+  <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+        <img src="imagens/logo1.png" alt="Logo naturAYO">
+        <h1>naturAYO</h1>
+      </div>
+    <div class="user-info">
+      <img src="imagens/foto-perfil.jpg" alt="Foto do usuário">
+      <span>Usuário: Danilo Martins</span>
+    </div>
+  </header>
+  <nav class="sidebar">
+    <a href="dashboard2.html">Início</a>
+    <a href="estoque.html">Estoque</a>
+    <a href="cadastrarProduto.html">Cadastrar Produto</a>
+    <a href="cadastrarEntradas.html" class="active">Cadastrar Entradas</a>
+    <a href="cadastrarSaidas.html">Cadastrar Saídas</a>
+    <a href="relatorios.html">Relatórios</a>
+    <a href="configuracoes.html">Configurações</a>
+    <a href="ajuda.html">Ajuda</a>
+  </nav>
+
+  <main class="main-content">
+    <section class="content-section">
+      <h2>Cadastrar Entradas</h2>
+      <form>
+        <div class="form-group">
+          <label for="produtoEntrada">Produto</label>
+          <select id="produtoEntrada" name="produtoEntrada" required>
+            <option value="">Selecione o Produto</option>
+            <option value="Produto A">Produto A</option>
+            <option value="Produto B">Produto B</option>
+            <option value="Produto C">Produto C</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantidadeEntrada">Quantidade</label>
+          <input type="number" id="quantidadeEntrada" name="quantidadeEntrada" required>
+        </div>
+
+        <div class="form-group">
+          <label for="dataEntrada">Data da Entrada</label>
+          <input type="date" id="dataEntrada" name="dataEntrada" required>
+        </div>
+
+        <div class="form-group">
+          <label for="observacoes">Observações</label>
+          <textarea id="observacoes" name="observacoes"></textarea>
+        </div>
+
+        <button type="submit">Registrar Entrada</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+</body>
+</html>
