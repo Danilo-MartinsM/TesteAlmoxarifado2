@@ -53,11 +53,10 @@ def criar_produto(
 
     # Registrar movimentação (Entrada)
     sql_mov = """
-    INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, relatorio, id_produto) 
+    INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) 
     VALUES ('Entrada', %s, %s, %s, %s)
     """
-    relatorio_texto = f"Cadastro do produto: {nome}"
-    valores_mov = (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), relatorio_texto, produto_id)
+    valores_mov = (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
     cursor.execute(sql_mov, valores_mov)
 
     db.commit()
@@ -216,7 +215,7 @@ def listar_movimentacoes():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
     sql = """
-        SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, m.relatorio, p.nome AS produto
+        SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, p.nome AS produto
         FROM movimentacoes m
         JOIN produtos p ON m.id_produto = p.id
         ORDER BY m.data_alteracao DESC

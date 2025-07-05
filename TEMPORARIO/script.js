@@ -388,26 +388,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function carregarMovimentacoes() {
   const container = document.querySelector(".movimentacao-list");
-  if (!container) {
-    console.log("Container não encontrado");
-    return;
-  }
+  if (!container) return;
 
   fetch("http://localhost:8000/movimentacoes")
     .then(res => res.json())
     .then(data => {
-      console.log("Movimentações:", data);
-      container.innerHTML = "";
+      container.innerHTML = ""; // limpa a lista
 
       data.forEach(mov => {
         const div = document.createElement("div");
-        div.classList.add("product-item");
+        div.classList.add("product-item");  // mantém o estilo igual
         div.innerHTML = `
           <div class="product-icon">🔁</div>
           <div>
             <strong>${mov.produto}</strong><br />
             <small>${mov.tipo} - ${mov.quantidade} unidades</small><br />
             <small>${new Date(mov.data_alteracao).toLocaleString('pt-BR')}</small><br />
+            <small>${mov.relatorio}</small>
           </div>
         `;
         container.appendChild(div);
@@ -418,8 +415,9 @@ function carregarMovimentacoes() {
     });
 }
 
-carregarMovimentacoes();
-
+document.addEventListener("DOMContentLoaded", () => {
+  carregarMovimentacoes();
+});
 
 
 

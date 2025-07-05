@@ -22,9 +22,9 @@
   </header>
 
   <nav class="sidebar">
-    <a href="dashboard2.html" class="active">Início</a>
-    <a href="estoque.html">Estoque</a>
-    <a href="cadastrarProduto.html">Cadastrar Produto</a>
+    <a href="TEMPORARIO/dashboard2.html" class="active">Início</a>
+    <a href="TEMPORARIO/estoque.html">Estoque</a>
+    <a href="TEMPORARIO/cadastrarProduto.html">Cadastrar Produto</a>
     <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
     <a href="cadastrarSaidas.html">Cadastrar Saídas</a>
     <a href="relatorios.html">Relatórios</a>
@@ -34,63 +34,18 @@
 
   <main class="main-content">
 
-    <h2>Últimas Movimentações</h2>
-<div class="movimentacao-list product-list">
-  <!-- Conteúdo dinâmico via JS -->
-</div>
+<section class="content-section">
+  <h2>Últimas Movimentações</h2>
+  <div class="movimentacao-list product-list">
+    <!-- Conteúdo dinâmico via JS -->
+  </div>
+</section>
 
-    <section class="content-section">
-      <div class="current-date">
-        <h2 id="data-atual">Hoje: </h2>
-      </div>
-
-      <h2>Últimos Produtos Cadastrados</h2>
-      <div class="product-list">
-        <div class="product-item">
-          <div class="product-icon">📦</div>
-          <div>
-            <strong>Produto A</strong><br />
-            <small>10 unidades</small><br />
-            <small>Cadastrado em: 08/05/2025</small>
-          </div>
-        </div>
-        <div class="product-item">
-          <div class="product-icon">📦</div>
-          <div>
-            <strong>Produto B</strong><br />
-            <small>5 unidades</small><br />
-            <small>Cadastrado em: 07/05/2025</small>
-          </div>
-        </div>
-        <div class="product-item">
-          <div class="product-icon">📦</div>
-          <div>
-            <strong>Produto C</strong><br />
-            <small>20 unidades</small><br />
-            <small>Cadastrado em: 06/05/2025</small>
-          </div>
-        </div>
-        <div class="product-item">
-          <div class="product-icon">📦</div>
-          <div>
-            <strong>Produto D</strong><br />
-            <small>8 unidades</small><br />
-            <small>Cadastrado em: 05/05/2025</small>
-          </div>
-        </div>
-        <div class="product-item">
-          <div class="product-icon">📦</div>
-          <div>
-            <strong>Produto E</strong><br />
-            <small>12 unidades</small><br />
-            <small>Cadastrado em: 04/05/2025</small>
-          </div>
-        </div>
-      </div>
-    </section>
+   
 
     <aside class="calendar">
       <h3>Calendário</h3>
+      <div id="data-atual" style="margin-bottom:10px; font-weight:600;"></div>
 
       <div class="filter-group">
         <label for="filtroProduto">Filtrar por Produto:</label>
@@ -120,80 +75,6 @@
 
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const calendarEl = document.getElementById('calendar');
-      const dataAtualEl = document.getElementById('data-atual');
-      const filtroProduto = document.getElementById('filtroProduto');
-      const filtroCategoria = document.getElementById('filtroCategoria');
-
-      const eventosOriginais = [
-        { title: 'Produto A - Higiene', date: '2025-05-08', color: '#2ecc71' },   // Verde
-        { title: 'Produto B - Alimentos', date: '2025-05-07', color: '#3498db' }, // Azul
-        { title: 'Produto C - Cosméticos', date: '2025-05-06', color: '#9b59b6' },// Roxo
-        { title: 'Produto D - Higiene', date: '2025-05-05', color: '#2ecc71' },
-        { title: 'Produto E - Alimentos', date: '2025-05-04', color: '#3498db' }
-      ];
-
-      function filtrarEventos() {
-        const produtoSelecionado = filtroProduto.value;
-        const categoriaSelecionada = filtroCategoria.value;
-
-        return eventosOriginais.filter(ev => {
-          const [produto, categoria] = ev.title.split(' - ');
-          return (
-            (!produtoSelecionado || produto === produtoSelecionado) &&
-            (!categoriaSelecionada || categoria === categoriaSelecionada)
-          );
-        });
-      }
-
-      // Destaque do dia atual
-      const hoje = new Date().toISOString().split('T')[0];
-      const eventosHoje = [{
-        title: 'Hoje',
-        date: hoje,
-        display: 'background',
-        backgroundColor: '#ffeaa7' // amarelo claro
-      }];
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'pt-br',
-        events: [...filtrarEventos(), ...eventosHoje],
-        dateClick: function (info) {
-          const selectedDate = info.date.toISOString().split('T')[0];
-          if (selectedDate === hoje) {
-            dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
-              day: '2-digit', month: 'long', year: 'numeric'
-            });
-          } else {
-            dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
-              day: '2-digit', month: 'long', year: 'numeric'
-            });
-          }
-          document.querySelectorAll('.fc-day').forEach(day => {
-            day.classList.remove('fc-day-selected');
-          });
-
-          info.dayEl.classList.add('fc-day-selected');
-        }
-      });
-
-      calendar.render();
-
-      dataAtualEl.textContent = 'Hoje: ' + new Date().toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'long', year: 'numeric'
-      });
-
-      [filtroProduto, filtroCategoria].forEach(filtro =>
-        filtro.addEventListener('change', () => {
-          calendar.removeAllEvents();
-          calendar.addEventSource([...filtrarEventos(), ...eventosHoje]);
-        })
-      );
-    });
-  </script>
   <script src="script.js"></script>
 </body>
 </html>
