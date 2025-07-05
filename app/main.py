@@ -100,7 +100,7 @@ def atualizar_produto(
 
 @app.get("/produtos")
 def listar_produtos(
-    order_by: str = Query("id", regex="^(id|nome|categoria|quantidade_inicial)$"),
+    order_by: str = Query("id", regex="^(id|nome|categoria|quantidade_inicial|ultima_alteracao)$"),
     order_dir: str = Query("asc", regex="^(asc|desc)$"),
     busca: Optional[str] = None,
     categoria_id: Optional[int] = Query(None),
