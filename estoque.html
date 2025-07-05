@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Estoque - naturAYO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon"/>
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <img src="imagens/logo1.png" alt="Logo naturAYO" />
+      <h1>naturAYO</h1>
+    </div>
+    <div class="user-info">
+      <img src="imagens/foto-perfil.jpg" alt="Foto do usuário" />
+      <span>Usuário: Danilo Martins</span>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <a href="dashboard2.html">Início</a>
+    <a href="estoque.html" class="active">Estoque</a>
+    <a href="cadastrarProduto.html">Cadastrar Produto</a>
+    <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
+    <a href="cadastrarSaidas.html">Cadastrar Saídas</a>
+    <a href="relatorios.html">Relatórios</a>
+    <a href="configuracoes.html">Configurações</a>
+    <a href="ajuda.html">Ajuda</a>
+  </nav>
+
+  <main class="main-content">
+    <section class="content-section">
+      <h2>Estoque Atual</h2>
+
+      <div class="filtros">
+        <div class="filtro-texto">
+          <input type="text" id="busca" placeholder="Buscar por nome" oninput="carregarProdutos()" />
+          <ul id="autocompleteList"></ul>
+        </div>
+
+        <select id="filtro-categoria" onchange="carregarProdutos()">
+          <option value="">Todas as Categorias</option>
+        </select>
+
+        <input type="date" id="filtro-data" onchange="carregarProdutos()" />
+      </div>
+
+      <div class="table-container">
+        <table id="tabela-produtos">
+          <thead>
+            <tr>
+              <th data-coluna="id">ID</th>
+              <th data-coluna="nome">Nome</th>
+              <th data-coluna="categoria">Categoria</th>
+              <th data-coluna="quantidade_inicial">Quantidade</th>
+              <th data-coluna="ultima_alteracao">Última Alteração</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Conteúdo dinâmico JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de edição -->
+  <!-- MODAL DE EDIÇÃO -->
+    <div id="modal-editar" class="modal" style="display: none;">
+    <form id="form-editar" class="modal-conteudo">
+        <input type="hidden" id="editar-id">
+
+        <label for="editar-nome">Nome:</label>
+        <input type="text" id="editar-nome" required>
+
+        <label for="editar-categoria">Categoria:</label>
+        <select id="editar-categoria" required></select>
+
+        <div class="modal-botoes">
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </form>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastrar Produto - naturAYO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <img src="imagens/logo1.png" alt="Logo naturAYO" />
+      <h1>naturAYO</h1>
+    </div>
+    <div class="user-info">
+      <img src="imagens/foto-perfil.jpg" alt="Foto do usuário" />
+      <span>Usuário: Danilo Martins</span>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <a href="dashboard2.html">Início</a>
+    <a href="estoque.html">Estoque</a>
+    <a href="cadastrarProduto.html" class="active">Cadastrar Produto</a>
+    <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
+    <a href="cadastrarSaidas.html">Cadastrar Saídas</a>
+    <a href="relatorios.html">Relatórios</a>
+    <a href="configuracoes.html">Configurações</a>
+    <a href="ajuda.html">Ajuda</a>
+  </nav>
+
+  <main class="main-content">
+    <section class="content-section">
+      <h2>Cadastrar Produto</h2>
+      <form id="form-cadastro">
+        <div class="form-group">
+          <label for="nomeProduto">Nome do Produto</label>
+          <input type="text" id="nomeProduto" name="nomeProduto" required />
+        </div>
+
+        <div class="form-group">
+          <label for="categoriaProduto">Categoria</label>
+          <select id="categoriaProduto" name="categoriaProduto" required>
+            <option value="">Carregando categorias...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dataAlteracao">Data de Entrada</label>
+          <input type="datetime-local" id="dataAlteracao" name="dataAlteracao" required />
+        </div>
+
+        <div class="form-group">
+          <label for="quantidadeInicial">Quantidade Inicial</label>
+          <input type="number" id="quantidadeInicial" name="quantidadeInicial" min="0" step="1" required />
+        </div>
+
+        <button type="submit">Cadastrar Produto</button>
+        <p id="mensagem" style="margin-top: 10px;"></p>
+      </form>
+    </section>
+  </main>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>
