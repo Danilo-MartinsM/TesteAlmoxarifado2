@@ -310,6 +310,52 @@ if (document.getElementById("tabela-produtos")) {
         });
     }
 
+
+
+
+    
+function carregarMovimentacoes() {
+  fetch("http://localhost:8000/movimentacoes")
+    .then(res => res.json())
+    .then(data => {
+      const container = document.querySelector(".movimentacao-list");
+      if (!container) return;
+
+      container.innerHTML = ""; // limpa antes de preencher
+
+      data.forEach(mov => {
+        const div = document.createElement("div");
+        div.classList.add("product-item");
+
+        div.innerHTML = `
+          <div class="product-icon">🔁</div>
+          <div>
+            <strong>${mov.produto}</strong><br />
+            <small>${mov.tipo} - ${mov.quantidade} unidades</small><br />
+            <small>${new Date(mov.data_alteracao).toLocaleString("pt-BR")}</small><br />
+            <small>${mov.relatorio}</small>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error("Erro ao carregar movimentações:", err);
+    });
+}
+
+// Executar ao carregar a página dashboard (onde tiver o container)
+window.addEventListener("load", () => {
+  carregarMovimentacoes();
+});
+
+
+
+
+
+
+
     // Executar ao carregar a página de estoque
     window.onload = function () {
         carregarCategorias();

@@ -56,7 +56,7 @@ def criar_produto(
     INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, relatorio, id_produto) 
     VALUES ('Entrada', %s, %s, %s, %s)
     """
-    relatorio_texto = f"Entrada inicial do produto {nome}"
+    relatorio_texto = f"Cadastro do produto: {nome}"
     valores_mov = (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), relatorio_texto, produto_id)
     cursor.execute(sql_mov, valores_mov)
 
@@ -208,3 +208,22 @@ def login(username: str = Form(...), senha: str = Form(...)):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
     return {"mensagem": "Login realizado com sucesso!"}
+
+
+
+@app.get("/movimentacoes")
+def listar_movimentacoes():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    sql = """
+        SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, m.relatorio, p.nome AS produto
+        FROM movimentacoes m
+        JOIN produtos p ON m.id_produto = p.id
+        ORDER BY m.data_alteracao DESC
+        LIMIT 10
+    """
+    cursor.execute(sql)
+    movimentacoes = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return movimentacoes
