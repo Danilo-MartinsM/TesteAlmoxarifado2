@@ -284,7 +284,12 @@ if (document.getElementById("calendar")) {
   const filtroProduto = document.getElementById('filtroProduto');
   const filtroCategoria = document.getElementById('filtroCategoria');
 
-  const hoje = new Date().toISOString().split('T')[0];
+  // Define data de hoje no formato yyyy-mm-dd com zeros à esquerda
+  const hojeDate = new Date();
+  const hoje = hojeDate.getFullYear() + '-' +
+               String(hojeDate.getMonth() + 1).padStart(2, '0') + '-' +
+               String(hojeDate.getDate()).padStart(2, '0');
+
   const eventosHoje = [{
     title: 'Hoje',
     date: hoje,
@@ -292,41 +297,77 @@ if (document.getElementById("calendar")) {
     backgroundColor: '#ffeaa7'
   }];
 
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-  initialView: 'dayGridMonth',
-  locale: 'pt-br',
-  events: [...eventosHoje], // removido filtrarEventos()
-  dateClick: function (info) {
-    const selectedDate = info.date.toISOString().split('T')[0];
-    if (selectedDate === hoje) {
-      dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'long', year: 'numeric'
-      });
-    } else {
-      dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'long', year: 'numeric'
+  function buscarEventosFiltrados() {
+    // Verifica se os filtros existem antes de acessar value
+    const produtoSelecionado = filtroProduto ? filtroProduto.value : "";
+    const categoriaSelecionada = filtroCategoria ? filtroCategoria.value : "";
+
+    const eventos = [];
+
+    if (produtoSelecionado) {
+      eventos.push({
+        title: `Eventos do produto ${produtoSelecionado}`,
+        date: hoje,
+        backgroundColor: '#74b9ff'
       });
     }
-    document.querySelectorAll('.fc-day').forEach(day => {
-      day.classList.remove('fc-day-selected');
-    });
 
-    info.dayEl.classList.add('fc-day-selected');
+    if (categoriaSelecionada) {
+      eventos.push({
+        title: `Eventos da categoria ${categoriaSelecionada}`,
+        date: hoje,
+        backgroundColor: '#55efc4'
+      });
+    }
+
+    if (!produtoSelecionado && !categoriaSelecionada) {
+      eventos.push(...eventosHoje);
+    }
+
+    return eventos;
   }
-});
 
-calendar.render();
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'pt-br',
+    events: [...eventosHoje],
+    dateClick: function (info) {
+      const selectedDate = info.date.toISOString().split('T')[0];
+      if (selectedDate === hoje) {
+        dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'long', year: 'numeric'
+        });
+      } else {
+        dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'long', year: 'numeric'
+        });
+      }
+      document.querySelectorAll('.fc-day').forEach(day => {
+        day.classList.remove('fc-day-selected');
+      });
 
-dataAtualEl.textContent = 'Hoje: ' + new Date().toLocaleDateString('pt-BR', {
-  day: '2-digit', month: 'long', year: 'numeric'
-});
+      info.dayEl.classList.add('fc-day-selected');
+    }
+  });
 
-[filtroProduto, filtroCategoria].forEach(filtro =>
-  filtro.addEventListener('change', () => {
-    calendar.removeAllEvents();
-    calendar.addEventSource([...eventosHoje]); // removido filtrarEventos()
-  })
-);
+  calendar.render();
+
+  dataAtualEl.textContent = 'Hoje: ' + hojeDate.toLocaleDateString('pt-BR', {
+    day: '2-digit', month: 'long', year: 'numeric'
+  });
+
+  // Atualiza eventos no calendário quando filtros mudam
+  [filtroProduto, filtroCategoria].forEach(filtro => {
+    if (filtro) {
+      filtro.addEventListener('change', () => {
+        calendar.removeAllEvents();
+        const eventosFiltrados = buscarEventosFiltrados();
+        calendar.addEventSource(eventosFiltrados);
+      });
+    }
+  });
+
+
 
 
 // --- MOVIMENTAÇÕES ---
@@ -373,16 +414,52 @@ function showToast(message, type = "success") {
 
   container.appendChild(toast);
   carregarMovimentacoes();
+}
   
   // Remove o toast depois de 3 segundos
   setTimeout(() => {
     toast.remove();
-  }, 3000);
+}, 3000);
+}
+
+if (document.querySelector(".movimentacao-list")) {
+  carregarMovimentacoes();
 }
 
 
+function buscarEventosFiltrados() {
+  // Aqui você pode pegar os valores dos filtros:
+  const produtoSelecionado = filtroProduto.value;
+  const categoriaSelecionada = filtroCategoria.value;
 
+  // Para testar, vou criar um array fictício de eventos
+  const eventos = [];
 
+  // Exemplo: se tiver um produto selecionado, adiciona evento diferente
+  if (produtoSelecionado) {
+    eventos.push({
+      title: `Eventos do produto ${produtoSelecionado}`,
+      date: hoje,
+      backgroundColor: '#74b9ff'
+    });
+  }
+
+  // Se categoria selecionada, adiciona outro evento
+  if (categoriaSelecionada) {
+    eventos.push({
+      title: `Eventos da categoria ${categoriaSelecionada}`,
+      date: hoje,
+      backgroundColor: '#55efc4'
+    });
+  }
+
+  // Se não tem nada selecionado, mostra só o evento de hoje
+  if (!produtoSelecionado && !categoriaSelecionada) {
+    eventos.push(...eventosHoje);
+  }
+
+  return eventos;
+}
 
 
 

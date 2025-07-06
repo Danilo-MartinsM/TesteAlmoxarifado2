@@ -558,6 +558,12 @@ table#tabela-produtos thead th {
 #mensagem.sucesso {
   color: green;
 }
+#data-atual {
+  margin-bottom: 10px !important;
+  font-weight: 600 !important;
+}
+
+
 
 
 
