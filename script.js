@@ -18,11 +18,19 @@ function carregarCategoriasSelect(selectElement, textoPadrao = "Selecione uma ca
         option.textContent = cat.nome;
         selectElement.appendChild(option);
       });
+
+      // Aplica Select2 após carregar categorias
+      $(selectElement).select2({
+        placeholder: textoPadrao,
+        allowClear: true,
+        width: '100%'
+      });
     })
     .catch(() => {
       selectElement.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
     });
 }
+
 
 // --- LOGIN ---
 if (document.getElementById("login-form")) {
@@ -75,9 +83,19 @@ if (document.getElementById("form-cadastro")) {
   const dataInput = document.getElementById("dataAlteracao");
   if (dataInput) {
     const agora = new Date();
-    const localISO = agora.toISOString().slice(0, 16);
-    dataInput.value = localISO;
+
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+
+    const dataLocal = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+    dataInput.value = dataLocal;
   }
+
+
+
 
   if (categoriaSelect) carregarCategoriasSelect(categoriaSelect);
 
@@ -295,7 +313,7 @@ if (document.getElementById("calendar")) {
 
   function buscarEventosFiltrados() {
     // Verifica se os filtros existem antes de acessar value
-    const produtoSelecionado = filtroProduto ? filtroProduto.value : "";
+    const produtoSelecionado = filtroProduto ? $(filtroProduto).val() : "";
     const categoriaSelecionada = filtroCategoria ? filtroCategoria.value : "";
 
     const eventos = [];
@@ -353,17 +371,26 @@ if (document.getElementById("calendar")) {
   });
 
   // Atualiza eventos no calendário e lista de movimentações quando filtros mudam
-  [filtroProduto, filtroCategoria].forEach(filtro => {
-    if (filtro) {
-      filtro.addEventListener('change', () => {
-        calendar.removeAllEvents();
-        const eventosFiltrados = buscarEventosFiltrados();
-        calendar.addEventSource(eventosFiltrados);
+  if (filtroProduto) {
+  $(filtroProduto).on('change', () => {
+    calendar.removeAllEvents();
+    const eventosFiltrados = buscarEventosFiltrados();
+    calendar.addEventSource(eventosFiltrados);
 
-        carregarMovimentacoes();
-      });
-    }
+    carregarMovimentacoes();
   });
+}
+
+if (filtroCategoria) {
+  filtroCategoria.addEventListener('change', () => {
+    calendar.removeAllEvents();
+    const eventosFiltrados = buscarEventosFiltrados();
+    calendar.addEventSource(eventosFiltrados);
+
+    carregarMovimentacoes();
+  });
+}
+
 
   // Inicializa movimentações ao carregar calendário
   carregarMovimentacoes();
@@ -385,7 +412,8 @@ function carregarMovimentacoes() {
   const filtroCategoria = document.getElementById('filtroCategoria');
 
   // Lê os valores dos filtros
-  const produtoSelecionado = filtroProduto ? filtroProduto.value : "";
+  const produtoSelecionado = filtroProduto ? $(filtroProduto).val() : "";
+
   const categoriaSelecionada = filtroCategoria ? filtroCategoria.value : "";
 
   // Monta query string com filtros
@@ -419,21 +447,31 @@ function carregarMovimentacoes() {
 }
 
 function carregarProdutosSelect(selectElement, textoPadrao = "Todos os Produtos") {
+  
+  
   fetch("http://localhost:8000/produtos")
-    .then(res => res.json())
-    .then(data => {
-      selectElement.innerHTML = `<option value="">${textoPadrao}</option>`;
-      data.forEach(prod => {
-        const option = document.createElement("option");
-        option.value = prod.id;
-        option.textContent = prod.nome;
-        selectElement.appendChild(option);
-      });
-    })
-    .catch(() => {
+  .then(res => res.json())
+  .then(data => {
+    selectElement.innerHTML = `<option value="">${textoPadrao}</option>`; // opção padrão com valor vazio
+    data.forEach(prod => {
+      const option = document.createElement("option");
+      option.value = prod.id;
+      option.textContent = prod.nome;
+      selectElement.appendChild(option);
+    });
+    
+    $(selectElement).select2({
+      placeholder: textoPadrao,
+      allowClear: true,
+      width: '100%'
+    });
+    $(filtroProduto).val("").trigger("change");
+  })
+  .catch(() => {
       selectElement.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
     });
 }
+
 
 
 // --- TOASTS ---

@@ -2,14 +2,14 @@
   VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
 ============================*/
 :root {
-      --bg: #f4f4f4;
-      --sidebar: #333;
-      --sidebar-hover: #555;
-      --header: #ffffff;
-      --white: #fff;
-      --text: #2d3d3f;
-      --accent: #333;
-    }
+  --bg: #f4f4f4;
+  --sidebar: #333;
+  --sidebar-hover: #555;
+  --header: #ffffff;
+  --white: #fff;
+  --text: #2d3d3f;
+  --accent: #333;
+}
 
 * {
   box-sizing: border-box;
@@ -33,7 +33,7 @@ header {
   padding: 1rem 2rem;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-left: 240px; /* Compensa a sidebar */
+  margin-left: 240px;
 }
 
 header h1 {
@@ -52,7 +52,7 @@ header h1 {
   height: 100vh;
   background-color: var(--sidebar);
   padding-top: 5rem;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar a {
@@ -85,7 +85,6 @@ header h1 {
   gap: 2rem;
 }
 
-/* Seções de conteúdo e calendário */
 .content-section,
 .calendar {
   background-color: var(--white);
@@ -139,7 +138,6 @@ h3 {
 }
 
 .form-group input,
-.form-group select,
 .form-group textarea {
   width: 100%;
   padding: 0.8rem;
@@ -150,15 +148,6 @@ h3 {
 
 .form-group textarea {
   resize: vertical;
-}
-
-.form-group select {
-  appearance: none;
-  background-color: #fff;
-  background-image: url("data:image/svg+xml,%3Csvg fill='none' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%23008080'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.8rem center;
-  background-size: 1rem;
 }
 
 /*============================
@@ -279,18 +268,6 @@ tr:hover {
   color: var(--text);
 }
 
-.filter-group select {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  background-image: url("data:image/svg+xml,%3Csvg fill='none' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z' fill='%23008080'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.8rem center;
-  background-size: 1rem;
-}
-
 /*============================
   ESTILO PARA FULLCALENDAR
 ============================*/
@@ -328,18 +305,14 @@ tr:hover {
   font-size: 0.75rem;
 }
 
-/*=====================
-Estilos do calendário 
-======================*/
 .fc-day-selected {
-  background-color: #12f395 !important; /* Cor de destaque */
-  color: white !important; /* Cor do texto */
+  background-color: #12f395 !important;
+  color: white !important;
 }
 
-
-
-
-
+/*============================
+  FILTROS (BARRA SUPERIOR)
+============================*/
 .filtros {
   margin-top: 1.5rem;
   display: flex;
@@ -356,6 +329,12 @@ Estilos do calendário
 
 .filtro-texto input {
   width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filtros input[type="date"] {
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -379,17 +358,9 @@ Estilos do calendário
   border-radius: 0 0 4px 4px;
 }
 
-.filtros select,
-.filtros input[type="date"] {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-
-
-
-/* Botões da coluna Ações */
+/*============================
+  TABELA DE PRODUTOS - AÇÕES
+============================*/
 table#tabela-produtos td button {
   padding: 0.3rem 0.6rem;
   margin: 0 0.2rem;
@@ -402,7 +373,7 @@ table#tabela-produtos td button {
 }
 
 table#tabela-produtos td button:first-child {
-  background-color: #3498db; /* Azul para Editar */
+  background-color: #3498db;
   color: white;
 }
 
@@ -411,7 +382,7 @@ table#tabela-produtos td button:first-child:hover {
 }
 
 table#tabela-produtos td button:last-child {
-  background-color: #c0392b; /* Vermelho para Excluir */
+  background-color: #c0392b;
   color: white;
 }
 
@@ -419,34 +390,30 @@ table#tabela-produtos td button:last-child:hover {
   background-color: #922b21;
 }
 
-/* Última Alteração - alinhamento e fonte */
 table#tabela-produtos td:nth-child(5) {
   white-space: nowrap;
   font-size: 0.9rem;
   color: #555;
 }
 
-/* Células da tabela um pouco mais espaçadas */
 table#tabela-produtos td {
   padding: 0.6rem 0.8rem;
 }
 
-/* Cabeçalho das colunas */
 table#tabela-produtos thead th {
   padding: 0.8rem;
   text-align: left;
   border-bottom: 2px solid #ccc;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
-  cursor: pointer; /* Já tem essa no JS, mas reforça */
+  cursor: pointer;
 }
 
-
-
-
-/* Estilo do modal (sobreposição escura + centralizado) */
+/*============================
+  MODAL
+============================*/
 .modal {
-  display: none; /* escondido por padrão */
+  display: none;
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
@@ -458,19 +425,17 @@ table#tabela-produtos thead th {
   padding: 1rem;
 }
 
-/* Conteúdo interno do modal (form) */
 .modal-conteudo {
   background-color: var(--white);
   padding: 2rem 2.5rem;
   border-radius: 12px;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   font-family: 'Inter', sans-serif;
   color: var(--text);
 }
 
-/* Labels do formulário */
 .modal-conteudo label {
   display: block;
   font-weight: 600;
@@ -479,9 +444,7 @@ table#tabela-produtos thead th {
   font-size: 1rem;
 }
 
-/* Inputs e select do formulário */
-.modal-conteudo input[type="text"],
-.modal-conteudo select {
+.modal-conteudo input[type="text"] {
   width: 100%;
   padding: 0.6rem 0.8rem;
   border: 1.8px solid #b0b0b0;
@@ -498,11 +461,12 @@ table#tabela-produtos thead th {
   border-color: #008080;
   outline: none;
 }
-#dataAlteracao, #quantidadeInicial {
-    width: 200px; /* largura fixa de 150 pixels, ajuste como quiser */
+
+#dataAlteracao,
+#quantidadeInicial {
+  width: 200px;
 }
 
-/* Botões do modal */
 .modal-botoes {
   display: flex;
   justify-content: flex-end;
@@ -538,14 +502,13 @@ table#tabela-produtos thead th {
   background-color: #bbb;
 }
 
-/* Para deixar o campo oculto 'editar-id' invisível */
 #editar-id {
   display: none;
 }
 
-
-
-
+/*============================
+  MENSAGENS DE RETORNO
+============================*/
 #mensagem {
   margin-top: 1rem;
   font-weight: 600;
@@ -558,17 +521,17 @@ table#tabela-produtos thead th {
 #mensagem.sucesso {
   color: green;
 }
+
 #data-atual {
   margin-bottom: 10px !important;
   font-weight: 600 !important;
 }
 
-
-
-
-/* Deixa a altura e o padding parecido com um select normal */
+/*============================
+  SELECT2
+============================*/
 .select2-container .select2-selection--single {
-  height: 38px; /* ajuste conforme seu select original */
+  height: 38px;
   padding: 6px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -578,20 +541,17 @@ table#tabela-produtos thead th {
   color: #333;
 }
 
-/* Remove a sombra padrão do foco do Select2 para ficar mais simples */
 .select2-container--default.select2-container--focus .select2-selection--single {
-  border-color: #008080; /* cor de foco personalizada */
+  border-color: #008080;
   box-shadow: none;
 }
 
-/* Ajusta o dropdown para combinar com seu estilo */
 .select2-container--default .select2-results > .select2-results__options {
   max-height: 200px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
 }
 
-/* Ajusta os itens do dropdown para ficar como lista limpa */
 .select2-container--default .select2-results__option {
   padding: 8px 12px;
   cursor: pointer;
@@ -602,13 +562,9 @@ table#tabela-produtos thead th {
   color: white;
 }
 
-
-
-
-
-
-
-
+/*============================
+  TOAST CONTAINER
+============================*/
 #toast-container {
   position: fixed;
   top: 20px;
@@ -625,7 +581,7 @@ table#tabela-produtos thead th {
   border-radius: 5px;
   color: white;
   font-weight: 600;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   opacity: 0;
   transform: translateX(100%);
   animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
@@ -651,4 +607,40 @@ table#tabela-produtos thead th {
     opacity: 0;
     transform: translateX(100%);
   }
+}
+
+/*============================
+  SELECT PADRÃO
+============================*/
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background-color: var(--white);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23008080' height='16' viewBox='0 0 20 20' width='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+select:focus {
+  border-color: #008080;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.3);
+}
+
+select:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
 }
