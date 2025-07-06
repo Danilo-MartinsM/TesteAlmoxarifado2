@@ -203,3 +203,4 @@ def listar_movimentacoes():
     cursor.close()
     db.close()
     return movimentacoes
+

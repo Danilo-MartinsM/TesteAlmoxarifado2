@@ -242,13 +242,13 @@ if (document.getElementById("tabela-produtos")) {
     })
       .then(res => res.json())
       .then(data => {
-        showToast(data.mensagem, "success");
+        alert(data.mensagem);
         fecharModal();
         carregarProdutos();
       })
       .catch(err => {
         console.error("Erro ao editar produto:", err);
-        showToast("Erro ao editar produto", "error");
+        alert("Erro ao editar produto");
       });
   });
 
@@ -260,12 +260,12 @@ if (document.getElementById("tabela-produtos")) {
     })
       .then(res => res.json())
       .then(data => {
-        showToast(data.mensagem, "success");
+        alert(data.mensagem);
         carregarProdutos();
       })
       .catch(err => {
         console.error("Erro ao excluir produto:", err);
-        showToast("Erro ao excluir produto", "error");
+        alert("Erro ao excluir produto");
       });
   }
 
@@ -293,41 +293,41 @@ if (document.getElementById("calendar")) {
   }];
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'pt-br',
-    events: [...filtrarEventos(), ...eventosHoje], // filtrarEventos deve estar definido em outro lugar
-    dateClick: function (info) {
-      const selectedDate = info.date.toISOString().split('T')[0];
-      if (selectedDate === hoje) {
-        dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
-          day: '2-digit', month: 'long', year: 'numeric'
-        });
-      } else {
-        dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
-          day: '2-digit', month: 'long', year: 'numeric'
-        });
-      }
-      document.querySelectorAll('.fc-day').forEach(day => {
-        day.classList.remove('fc-day-selected');
+  initialView: 'dayGridMonth',
+  locale: 'pt-br',
+  events: [...eventosHoje], // removido filtrarEventos()
+  dateClick: function (info) {
+    const selectedDate = info.date.toISOString().split('T')[0];
+    if (selectedDate === hoje) {
+      dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
+        day: '2-digit', month: 'long', year: 'numeric'
       });
-
-      info.dayEl.classList.add('fc-day-selected');
+    } else {
+      dataAtualEl.textContent = 'Data: ' + info.date.toLocaleDateString('pt-BR', {
+        day: '2-digit', month: 'long', year: 'numeric'
+      });
     }
-  });
+    document.querySelectorAll('.fc-day').forEach(day => {
+      day.classList.remove('fc-day-selected');
+    });
 
-  calendar.render();
+    info.dayEl.classList.add('fc-day-selected');
+  }
+});
 
-  dataAtualEl.textContent = 'Hoje: ' + new Date().toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  });
+calendar.render();
 
-  [filtroProduto, filtroCategoria].forEach(filtro =>
-    filtro.addEventListener('change', () => {
-      calendar.removeAllEvents();
-      calendar.addEventSource([...filtrarEventos(), ...eventosHoje]);
-    })
-  );
-}
+dataAtualEl.textContent = 'Hoje: ' + new Date().toLocaleDateString('pt-BR', {
+  day: '2-digit', month: 'long', year: 'numeric'
+});
+
+[filtroProduto, filtroCategoria].forEach(filtro =>
+  filtro.addEventListener('change', () => {
+    calendar.removeAllEvents();
+    calendar.addEventSource([...eventosHoje]); // removido filtrarEventos()
+  })
+);
+
 
 // --- MOVIMENTAÇÕES ---
 function carregarMovimentacoes() {
@@ -362,7 +362,6 @@ function carregarMovimentacoes() {
     });
 }
 
-carregarMovimentacoes();
 
 function showToast(message, type = "success") {
   const container = document.getElementById("toast-container");
@@ -373,8 +372,18 @@ function showToast(message, type = "success") {
   toast.textContent = message;
 
   container.appendChild(toast);
-
+  carregarMovimentacoes();
+  
+  // Remove o toast depois de 3 segundos
   setTimeout(() => {
     toast.remove();
   }, 3000);
 }
+
+
+
+
+
+
+
+
