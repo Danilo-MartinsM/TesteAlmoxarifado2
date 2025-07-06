@@ -6,12 +6,12 @@ let ordemAtual = {
 
 // --- Funções auxiliares ---
 
-// Carrega categorias em um select
-function carregarCategoriasSelect(selectElement) {
+// Carrega categorias em um select, com texto padrão personalizável
+function carregarCategoriasSelect(selectElement, textoPadrao = "Selecione uma categoria") {
   fetch("http://localhost:8000/categorias")
     .then(res => res.json())
     .then(data => {
-      selectElement.innerHTML = '<option value="">Selecione uma categoria</option>';
+      selectElement.innerHTML = `<option value="">${textoPadrao}</option>`;
       data.forEach(cat => {
         const option = document.createElement("option");
         option.value = cat.id;
@@ -20,7 +20,7 @@ function carregarCategoriasSelect(selectElement) {
       });
     })
     .catch(() => {
-      selectElement.innerHTML = '<option value="">Erro ao carregar categorias</option>';
+      selectElement.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
     });
 }
 
@@ -116,33 +116,11 @@ if (document.getElementById("form-cadastro")) {
 if (document.getElementById("tabela-produtos")) {
 
   function carregarCategorias() {
-    fetch("http://localhost:8000/categorias")
-      .then(res => res.json())
-      .then(data => {
-        const selectCadastro = document.getElementById("categoria");
-        const selectFiltro = document.getElementById("filtro-categoria");
+    const selectCadastro = document.getElementById("categoria");
+    const selectFiltro = document.getElementById("filtro-categoria");
 
-        if (selectCadastro) {
-          selectCadastro.innerHTML = "";
-          data.forEach(cat => {
-            const optionCadastro = document.createElement("option");
-            optionCadastro.value = cat.id;
-            optionCadastro.textContent = cat.nome;
-            selectCadastro.appendChild(optionCadastro);
-          });
-        }
-
-        if (selectFiltro) {
-          selectFiltro.innerHTML = '<option value="">Todas as Categorias</option>';
-          data.forEach(cat => {
-            const optionFiltro = document.createElement("option");
-            optionFiltro.value = cat.id;
-            optionFiltro.textContent = cat.nome;
-            selectFiltro.appendChild(optionFiltro);
-          });
-        }
-      })
-      .catch(err => console.error("Erro ao carregar categorias", err));
+    if (selectCadastro) carregarCategoriasSelect(selectCadastro);
+    if (selectFiltro) carregarCategoriasSelect(selectFiltro, "Todas as Categorias");
   }
 
   function carregarProdutos() {
@@ -205,18 +183,19 @@ if (document.getElementById("tabela-produtos")) {
     document.getElementById("editar-nome").value = nome;
 
     const selectEditar = document.getElementById("editar-categoria");
+    if (selectEditar) carregarCategoriasSelect(selectEditar);
 
     fetch("http://localhost:8000/categorias")
       .then(res => res.json())
       .then(categorias => {
-        selectEditar.innerHTML = "";
-        categorias.forEach(cat => {
-          const option = document.createElement("option");
-          option.value = cat.id;
-          option.textContent = cat.nome;
-          if (cat.id == id_categoria) option.selected = true;
-          selectEditar.appendChild(option);
-        });
+        // Depois de carregar as categorias, seleciona a correta
+        const options = selectEditar.options;
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].value == id_categoria) {
+            options[i].selected = true;
+            break;
+          }
+        }
         document.getElementById("modal-editar").style.display = "flex";
       });
   }
@@ -283,6 +262,23 @@ if (document.getElementById("calendar")) {
   const dataAtualEl = document.getElementById('data-atual');
   const filtroProduto = document.getElementById('filtroProduto');
   const filtroCategoria = document.getElementById('filtroCategoria');
+
+  // Preenche os filtros
+  if (filtroCategoria) {
+    carregarCategoriasSelect(filtroCategoria, "Todas as Categorias");
+  }
+  if (filtroProduto) {
+    carregarProdutosSelect(filtroProduto, "Todos os Produtos");
+  }
+  $(document).ready(function() {
+  $('#filtroProduto').select2({
+    placeholder: "Buscar produto...",
+    allowClear: true,
+    width: '100%'  // para usar toda a largura do select original
+  });
+});
+
+
 
   // Define data de hoje no formato yyyy-mm-dd com zeros à esquerda
   const hojeDate = new Date();
@@ -356,21 +352,28 @@ if (document.getElementById("calendar")) {
     day: '2-digit', month: 'long', year: 'numeric'
   });
 
-  // Atualiza eventos no calendário quando filtros mudam
+  // Atualiza eventos no calendário e lista de movimentações quando filtros mudam
   [filtroProduto, filtroCategoria].forEach(filtro => {
     if (filtro) {
       filtro.addEventListener('change', () => {
         calendar.removeAllEvents();
         const eventosFiltrados = buscarEventosFiltrados();
         calendar.addEventSource(eventosFiltrados);
+
+        carregarMovimentacoes();
       });
     }
   });
 
-
-
+  // Inicializa movimentações ao carregar calendário
+  carregarMovimentacoes();
+}
 
 // --- MOVIMENTAÇÕES ---
+
+
+
+
 function carregarMovimentacoes() {
   const container = document.querySelector(".movimentacao-list");
   if (!container) {
@@ -378,7 +381,19 @@ function carregarMovimentacoes() {
     return;
   }
 
-  fetch("http://localhost:8000/movimentacoes")
+  const filtroProduto = document.getElementById('filtroProduto');
+  const filtroCategoria = document.getElementById('filtroCategoria');
+
+  // Lê os valores dos filtros
+  const produtoSelecionado = filtroProduto ? filtroProduto.value : "";
+  const categoriaSelecionada = filtroCategoria ? filtroCategoria.value : "";
+
+  // Monta query string com filtros
+  let url = "http://localhost:8000/movimentacoes?";
+  if (produtoSelecionado) url += `produto_id=${encodeURIComponent(produtoSelecionado)}&`;
+  if (categoriaSelecionada) url += `categoria_id=${encodeURIComponent(categoriaSelecionada)}&`;
+
+  fetch(url)
     .then(res => res.json())
     .then(data => {
       console.log("Movimentações:", data);
@@ -403,6 +418,25 @@ function carregarMovimentacoes() {
     });
 }
 
+function carregarProdutosSelect(selectElement, textoPadrao = "Todos os Produtos") {
+  fetch("http://localhost:8000/produtos")
+    .then(res => res.json())
+    .then(data => {
+      selectElement.innerHTML = `<option value="">${textoPadrao}</option>`;
+      data.forEach(prod => {
+        const option = document.createElement("option");
+        option.value = prod.id;
+        option.textContent = prod.nome;
+        selectElement.appendChild(option);
+      });
+    })
+    .catch(() => {
+      selectElement.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
+    });
+}
+
+
+// --- TOASTS ---
 
 function showToast(message, type = "success") {
   const container = document.getElementById("toast-container");
@@ -414,53 +448,13 @@ function showToast(message, type = "success") {
 
   container.appendChild(toast);
   carregarMovimentacoes();
-}
-  
+
   // Remove o toast depois de 3 segundos
   setTimeout(() => {
     toast.remove();
-}, 3000);
+  }, 3000);
 }
 
 if (document.querySelector(".movimentacao-list")) {
   carregarMovimentacoes();
 }
-
-
-function buscarEventosFiltrados() {
-  // Aqui você pode pegar os valores dos filtros:
-  const produtoSelecionado = filtroProduto.value;
-  const categoriaSelecionada = filtroCategoria.value;
-
-  // Para testar, vou criar um array fictício de eventos
-  const eventos = [];
-
-  // Exemplo: se tiver um produto selecionado, adiciona evento diferente
-  if (produtoSelecionado) {
-    eventos.push({
-      title: `Eventos do produto ${produtoSelecionado}`,
-      date: hoje,
-      backgroundColor: '#74b9ff'
-    });
-  }
-
-  // Se categoria selecionada, adiciona outro evento
-  if (categoriaSelecionada) {
-    eventos.push({
-      title: `Eventos da categoria ${categoriaSelecionada}`,
-      date: hoje,
-      backgroundColor: '#55efc4'
-    });
-  }
-
-  // Se não tem nada selecionado, mostra só o evento de hoje
-  if (!produtoSelecionado && !categoriaSelecionada) {
-    eventos.push(...eventosHoje);
-  }
-
-  return eventos;
-}
-
-
-
-

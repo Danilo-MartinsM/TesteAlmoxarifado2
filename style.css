@@ -566,6 +566,46 @@ table#tabela-produtos thead th {
 
 
 
+/* Deixa a altura e o padding parecido com um select normal */
+.select2-container .select2-selection--single {
+  height: 38px; /* ajuste conforme seu select original */
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Remove a sombra padrão do foco do Select2 para ficar mais simples */
+.select2-container--default.select2-container--focus .select2-selection--single {
+  border-color: #008080; /* cor de foco personalizada */
+  box-shadow: none;
+}
+
+/* Ajusta o dropdown para combinar com seu estilo */
+.select2-container--default .select2-results > .select2-results__options {
+  max-height: 200px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+/* Ajusta os itens do dropdown para ficar como lista limpa */
+.select2-container--default .select2-results__option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #008080;
+  color: white;
+}
+
+
+
+
+
 
 
 

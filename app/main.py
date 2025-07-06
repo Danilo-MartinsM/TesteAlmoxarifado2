@@ -185,22 +185,38 @@ def login(username: str = Form(...), senha: str = Form(...)):
 
     return {"mensagem": "Login realizado com sucesso!"}
 
+
+
 # --- ROTAS MOVIMENTAÇÕES ---
 
 @app.get("/movimentacoes")
-def listar_movimentacoes():
+def listar_movimentacoes(
+    produto_id: Optional[int] = Query(None),
+    categoria_id: Optional[int] = Query(None)
+):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
     sql = """
-        SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, p.nome AS produto
+        SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, p.nome AS produto, p.id_categoria
         FROM movimentacoes m
         JOIN produtos p ON m.id_produto = p.id
-        ORDER BY m.data_alteracao DESC
-        LIMIT 10
+        WHERE 1=1
     """
-    cursor.execute(sql)
+    params = []
+
+    if produto_id:
+        sql += " AND p.id = %s"
+        params.append(produto_id)
+    if categoria_id:
+        sql += " AND p.id_categoria = %s"
+        params.append(categoria_id)
+
+    sql += " ORDER BY m.data_alteracao DESC"
+
+    cursor.execute(sql, params)
     movimentacoes = cursor.fetchall()
     cursor.close()
     db.close()
     return movimentacoes
+
 
