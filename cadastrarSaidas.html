@@ -7,6 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
   <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
+  <!-- jQuery (requerido para Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,7 +35,6 @@
     <a href="cadastrarProduto.html">Cadastrar Produto</a>
     <a href="cadastrarEntradas.html">Cadastrar Entradas</a>
     <a href="#" class="active">Cadastrar Saídas</a>
-    <a href="relatorios.html">Relatórios</a>
     <a href="configuracoes.html">Configurações</a>
     <a href="ajuda.html">Ajuda</a>
   </nav>
@@ -36,14 +43,9 @@
     <section class="content-section">
       <h2>Cadastrar Saídas</h2>
       <form>
-        <div class="form-group">
-          <label for="produtoSaida">Produto</label>
-          <select id="produtoSaida" name="produtoSaida" required>
-            <option value="">Selecione o Produto</option>
-            <option value="Produto A">Produto A</option>
-            <option value="Produto B">Produto B</option>
-            <option value="Produto C">Produto C</option>
-          </select>
+        <div class="filter-group">
+          <label for="filtroProdutoSaida">Produto</label>
+          <select id="filtroProdutoSaida" style="width: 100%;"></select>
         </div>
 
         <div class="form-group">
@@ -58,12 +60,14 @@
 
         <button type="submit">Registrar Saída</button>
       </form>
+
     </section>
   </main>
 
 
-
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
 </body>
 </html>

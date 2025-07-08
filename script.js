@@ -6,7 +6,7 @@ let ordemAtual = {
 
 // --- Funções auxiliares ---
 
-// Carrega categorias em um select, com texto padrão personalizável
+// Carrega categorias em um select, com texto padrão personalizável (SEM Select2)
 function carregarCategoriasSelect(selectElement, textoPadrao = "Selecione uma categoria") {
   fetch("http://localhost:8000/categorias")
     .then(res => res.json())
@@ -18,8 +18,27 @@ function carregarCategoriasSelect(selectElement, textoPadrao = "Selecione uma ca
         option.textContent = cat.nome;
         selectElement.appendChild(option);
       });
+      // NÃO aplica select2 aqui para categorias
+    })
+    .catch(() => {
+      selectElement.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
+    });
+}
 
-      // Aplica Select2 após carregar categorias
+// Carrega produtos em um select COM Select2
+function carregarProdutosSelect(selectElement, textoPadrao = "Todos os Produtos") {
+  fetch("http://localhost:8000/produtos")
+    .then(res => res.json())
+    .then(data => {
+      selectElement.innerHTML = `<option value="">${textoPadrao}</option>`;
+      data.forEach(prod => {
+        const option = document.createElement("option");
+        option.value = prod.id;
+        option.textContent = prod.nome;
+        selectElement.appendChild(option);
+      });
+
+      // Aplica Select2 só aqui
       $(selectElement).select2({
         placeholder: textoPadrao,
         allowClear: true,
@@ -27,10 +46,9 @@ function carregarCategoriasSelect(selectElement, textoPadrao = "Selecione uma ca
       });
     })
     .catch(() => {
-      selectElement.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
+      selectElement.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
     });
 }
-
 
 // --- LOGIN ---
 if (document.getElementById("login-form")) {
@@ -62,7 +80,7 @@ if (document.getElementById("login-form")) {
       mensagem.classList.add("sucesso");
 
       setTimeout(() => {
-        window.location.href = "estoque.html";
+        window.location.href = "dashboard2.html";
       }, 1000);
     } catch (error) {
       mensagem.textContent = "Erro na conexão.";
@@ -93,9 +111,6 @@ if (document.getElementById("form-cadastro")) {
     const dataLocal = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
     dataInput.value = dataLocal;
   }
-
-
-
 
   if (categoriaSelect) carregarCategoriasSelect(categoriaSelect);
 
@@ -288,15 +303,9 @@ if (document.getElementById("calendar")) {
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Todos os Produtos");
   }
-  $(document).ready(function() {
-  $('#filtroProduto').select2({
-    placeholder: "Buscar produto...",
-    allowClear: true,
-    width: '100%'  // para usar toda a largura do select original
-  });
-});
 
-
+  // Inicializa Select2 no filtroProduto (após carregar produtos)
+  // Obs: Já chamado dentro carregarProdutosSelect, pode remover o $(document).ready desnecessário
 
   // Define data de hoje no formato yyyy-mm-dd com zeros à esquerda
   const hojeDate = new Date();
@@ -372,34 +381,30 @@ if (document.getElementById("calendar")) {
 
   // Atualiza eventos no calendário e lista de movimentações quando filtros mudam
   if (filtroProduto) {
-  $(filtroProduto).on('change', () => {
-    calendar.removeAllEvents();
-    const eventosFiltrados = buscarEventosFiltrados();
-    calendar.addEventSource(eventosFiltrados);
+    $(filtroProduto).on('change', () => {
+      calendar.removeAllEvents();
+      const eventosFiltrados = buscarEventosFiltrados();
+      calendar.addEventSource(eventosFiltrados);
 
-    carregarMovimentacoes();
-  });
-}
+      carregarMovimentacoes();
+    });
+  }
 
-if (filtroCategoria) {
-  filtroCategoria.addEventListener('change', () => {
-    calendar.removeAllEvents();
-    const eventosFiltrados = buscarEventosFiltrados();
-    calendar.addEventSource(eventosFiltrados);
+  if (filtroCategoria) {
+    filtroCategoria.addEventListener('change', () => {
+      calendar.removeAllEvents();
+      const eventosFiltrados = buscarEventosFiltrados();
+      calendar.addEventSource(eventosFiltrados);
 
-    carregarMovimentacoes();
-  });
-}
-
+      carregarMovimentacoes();
+    });
+  }
 
   // Inicializa movimentações ao carregar calendário
   carregarMovimentacoes();
 }
 
 // --- MOVIMENTAÇÕES ---
-
-
-
 
 function carregarMovimentacoes() {
   const container = document.querySelector(".movimentacao-list");
@@ -446,34 +451,6 @@ function carregarMovimentacoes() {
     });
 }
 
-function carregarProdutosSelect(selectElement, textoPadrao = "Todos os Produtos") {
-  
-  
-  fetch("http://localhost:8000/produtos")
-  .then(res => res.json())
-  .then(data => {
-    selectElement.innerHTML = `<option value="">${textoPadrao}</option>`; // opção padrão com valor vazio
-    data.forEach(prod => {
-      const option = document.createElement("option");
-      option.value = prod.id;
-      option.textContent = prod.nome;
-      selectElement.appendChild(option);
-    });
-    
-    $(selectElement).select2({
-      placeholder: textoPadrao,
-      allowClear: true,
-      width: '100%'
-    });
-    $(filtroProduto).val("").trigger("change");
-  })
-  .catch(() => {
-      selectElement.innerHTML = `<option value="">Erro ao carregar produtos</option>`;
-    });
-}
-
-
-
 // --- TOASTS ---
 
 function showToast(message, type = "success") {
@@ -498,8 +475,41 @@ if (document.querySelector(".movimentacao-list")) {
 }
 
 
-if (document.getElementById("filtroProduto") && window.location.href.includes("cadastrarEntradas.html")) {
-  const selectProduto = document.getElementById("filtroProduto");
-  carregarProdutosSelect(selectProduto, "Selecione um produto");
-}
+// --- CADASTRAR ENTRADAS ---
+if (window.location.pathname.includes("cadastrarEntradas.html")) {
+  const filtroProduto = document.getElementById("filtroProduto");
+  if (filtroProduto) {
+    carregarProdutosSelect(filtroProduto, "Selecione um produto");
+  }
 
+  // Preencher data/hora automaticamente
+  const dataInput = document.getElementById("dataAlteracao");
+  if (dataInput) {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+  }
+}
+// --- CADASTRAR SAÍDAS ---
+if (window.location.pathname.includes("cadastrarSaidas.html")) {
+  const filtroProdutoSaida = document.getElementById("filtroProdutoSaida");
+
+  if (filtroProdutoSaida) {
+    carregarProdutosSelect(filtroProdutoSaida, "Selecione um produto");
+  }
+
+  const dataInput = document.getElementById("dataSaida");
+  if (dataInput) {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+  }
+}
