@@ -496,3 +496,10 @@ function showToast(message, type = "success") {
 if (document.querySelector(".movimentacao-list")) {
   carregarMovimentacoes();
 }
+
+
+if (document.getElementById("filtroProduto") && window.location.href.includes("cadastrarEntradas.html")) {
+  const selectProduto = document.getElementById("filtroProduto");
+  carregarProdutosSelect(selectProduto, "Selecione um produto");
+}
+

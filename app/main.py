@@ -220,3 +220,45 @@ def listar_movimentacoes(
     return movimentacoes
 
 
+@app.post("/entradas")
+def registrar_entrada(
+    id_produto: int = Form(...),
+    quantidade: int = Form(...),
+    data_entrada: Optional[str] = Form(None)
+):
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Define a data atual se não for enviada
+    if data_entrada:
+        try:
+            data = datetime.strptime(data_entrada, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de data inválido")
+    else:
+        data = datetime.now()
+
+    # Atualiza a quantidade do produto
+    cursor.execute("SELECT quantidade_inicial FROM produtos WHERE id = %s", (id_produto,))
+    result = cursor.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    nova_quantidade = result[0] + quantidade
+
+    cursor.execute(
+        "UPDATE produtos SET quantidade_inicial = %s, ultima_alteracao = %s WHERE id = %s",
+        (nova_quantidade, data.strftime("%Y-%m-%d %H:%M:%S"), id_produto)
+    )
+
+    # Registra na tabela de movimentações
+    cursor.execute(
+        "INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) VALUES (%s, %s, %s, %s)",
+        ("Entrada", quantidade, data.strftime("%Y-%m-%d %H:%M:%S"), id_produto)
+    )
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return {"mensagem": "Entrada registrada com sucesso"}
