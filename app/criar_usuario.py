@@ -2,8 +2,8 @@ import bcrypt
 import mysql.connector
 
 # Dados do novo usuário
-username = "Ana Paula"
-senha = "AnaPaula12"
+username = ""
+senha = ""
 
 # Criptografar a senha
 senha_hash = bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()
