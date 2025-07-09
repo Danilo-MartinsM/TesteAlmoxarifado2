@@ -478,38 +478,196 @@ if (document.querySelector(".movimentacao-list")) {
 // --- CADASTRAR ENTRADAS ---
 if (window.location.pathname.includes("cadastrarEntradas.html")) {
   const filtroProduto = document.getElementById("filtroProduto");
+  const formEntrada = document.querySelector("form");
+  const dataInput = document.getElementById("dataAlteracao");
+
+  // <div id="mensagem" style="display:none; margin-top:10px; font-weight:bold;"></div>
+  const mensagem = document.getElementById("mensagem");
+
+  // Função para mostrar mensagens
+  function mostrarMensagem(texto, tipo = "erro") {
+    if (!mensagem) return;
+    mensagem.textContent = texto;
+    mensagem.className = tipo; // "erro" ou "sucesso"
+    mensagem.style.display = "block";
+
+    setTimeout(() => {
+      mensagem.style.display = "none";
+    }, 4000);
+  }
+
+  // Atualiza campo data/hora para horário atual formatado
+  function atualizarDataAtual() {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const horas = String(agora.getHours()).padStart(2, '0');
+    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    if (dataInput) dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+  }
+
+  // Carrega os produtos no select com Select2
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Selecione um produto");
   }
 
-  // Preencher data/hora automaticamente
-  const dataInput = document.getElementById("dataAlteracao");
   if (dataInput) {
+    atualizarDataAtual();
+  }
+
+  if (formEntrada) {
+    formEntrada.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id_produto = filtroProduto?.value;
+      const quantidadeStr = document.getElementById("quantidadeEntrada")?.value;
+      const data_alteracao = dataInput?.value;
+
+      // Validações
+      if (!id_produto) {
+        mostrarMensagem("Por favor, selecione um produto.", "erro");
+        return;
+      }
+
+      const quantidade = Number(quantidadeStr);
+      if (!quantidade || quantidade <= 0 || !Number.isInteger(quantidade)) {
+        mostrarMensagem("Informe uma quantidade válida (inteiro maior que zero).", "erro");
+        return;
+      }
+
+      if (!data_alteracao) {
+        mostrarMensagem("Informe a data da entrada.", "erro");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("id_produto", id_produto);
+      formData.append("quantidade", quantidade);
+      formData.append("data_alteracao", data_alteracao);
+
+      try {
+        const response = await fetch("http://localhost:8000/entradas", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          mostrarMensagem(result.mensagem || "Entrada registrada com sucesso.", "sucesso");
+          formEntrada.reset();
+          atualizarDataAtual();
+        } else {
+          mostrarMensagem(result.detail || "Erro ao registrar entrada.", "erro");
+        }
+      } catch (error) {
+        console.error("Erro ao enviar entrada:", error);
+        mostrarMensagem("Erro ao conectar com o servidor.", "erro");
+      }
+    });
+  }
+}
+
+
+
+
+
+
+
+// --- CADASTRAR SAÍDAS ---
+if (window.location.pathname.includes("cadastrarSaidas.html")) {
+  const filtroProdutoSaida = document.getElementById("filtroProdutoSaida");
+  const formSaida = document.querySelector("form");
+  const dataInput = document.getElementById("dataSaida");
+
+  // Crie um container para mensagens, ou adicione no HTML:
+  // <div id="mensagem" style="display:none; margin-top:10px; font-weight:bold;"></div>
+  const mensagem = document.getElementById("mensagem");
+
+  // Função para mostrar mensagens
+  function mostrarMensagem(texto, tipo = "erro") {
+    if (!mensagem) return;
+    mensagem.textContent = texto;
+    mensagem.className = tipo; // "erro" ou "sucesso"
+    mensagem.style.display = "block";
+
+    setTimeout(() => {
+      mensagem.style.display = "none";
+    }, 4000);
+  }
+
+  // Atualiza campo data/hora para horário atual formatado
+  function atualizarDataAtual() {
     const agora = new Date();
     const ano = agora.getFullYear();
     const mes = String(agora.getMonth() + 1).padStart(2, '0');
     const dia = String(agora.getDate()).padStart(2, '0');
     const horas = String(agora.getHours()).padStart(2, '0');
     const minutos = String(agora.getMinutes()).padStart(2, '0');
-    dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+    if (dataInput) dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
   }
-}
-// --- CADASTRAR SAÍDAS ---
-if (window.location.pathname.includes("cadastrarSaidas.html")) {
-  const filtroProdutoSaida = document.getElementById("filtroProdutoSaida");
 
+  // Carrega os produtos no select com Select2
   if (filtroProdutoSaida) {
     carregarProdutosSelect(filtroProdutoSaida, "Selecione um produto");
   }
 
-  const dataInput = document.getElementById("dataSaida");
   if (dataInput) {
-    const agora = new Date();
-    const ano = agora.getFullYear();
-    const mes = String(agora.getMonth() + 1).padStart(2, '0');
-    const dia = String(agora.getDate()).padStart(2, '0');
-    const horas = String(agora.getHours()).padStart(2, '0');
-    const minutos = String(agora.getMinutes()).padStart(2, '0');
-    dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+    atualizarDataAtual();
+  }
+
+  if (formSaida) {
+    formSaida.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id_produto = filtroProdutoSaida?.value;
+      const quantidadeStr = document.getElementById("quantidadeSaida")?.value;
+      const data_alteracao = dataInput?.value;
+
+      // Validações
+      if (!id_produto) {
+        mostrarMensagem("Por favor, selecione um produto.", "erro");
+        return;
+      }
+
+      const quantidade = Number(quantidadeStr);
+      if (!quantidade || quantidade <= 0 || !Number.isInteger(quantidade)) {
+        mostrarMensagem("Informe uma quantidade válida (inteiro maior que zero).", "erro");
+        return;
+      }
+
+      if (!data_alteracao) {
+        mostrarMensagem("Informe a data da saída.", "erro");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("id_produto", id_produto);
+      formData.append("quantidade", quantidade);
+      formData.append("data_alteracao", data_alteracao);
+
+      try {
+        const response = await fetch("http://localhost:8000/saidas", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          mostrarMensagem(result.mensagem || "Saída registrada com sucesso.", "sucesso");
+          formSaida.reset();
+          atualizarDataAtual();
+        } else {
+          mostrarMensagem(result.detail || "Erro ao registrar saída.", "erro");
+        }
+      } catch (error) {
+        console.error("Erro ao enviar saída:", error);
+        mostrarMensagem("Erro ao conectar com o servidor.", "erro");
+      }
+    });
   }
 }
+
+

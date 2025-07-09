@@ -44,28 +44,28 @@
       <form>
         <div class="filter-group">
         <label for="filtroProduto">Produto</label>
-        <select id="filtroProduto" style="width: 100%;"></select>
-        </select>
+        <select id="filtroProduto" name="id_produto" style="width: 100%;"></select>
       </div>
 
         <div class="form-group">
           <label for="quantidadeEntrada">Quantidade</label>
-          <input type="number" id="quantidadeEntrada" name="quantidadeEntrada" required>
+          <input type="number" id="quantidadeEntrada" name="quantidade" required>
         </div>
 
         <div class="form-group">
           <label for="dataAlteracao">Data de Entrada</label>
-          <input type="datetime-local" id="dataAlteracao" name="dataAlteracao" required />
+          <input type="datetime-local" id="dataAlteracao" name="data_alteracao" required />
         </div>
 
         <button type="submit">Registrar Entrada</button>
+        <div id="mensagem"></div>
       </form>
     </section>
   </main>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="script.js"></script>
 </body>
 </html>

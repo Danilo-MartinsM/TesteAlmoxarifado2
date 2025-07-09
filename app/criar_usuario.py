@@ -2,8 +2,8 @@ import bcrypt
 import mysql.connector
 
 # Dados do novo usuário
-nome = "admin"
-senha = "admin123"
+username = "Ana Paula"
+senha = "AnaPaula12"
 
 # Criptografar a senha
 senha_hash = bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()
@@ -16,7 +16,7 @@ conn = mysql.connector.connect(
     database="almoxarifado1"
 )
 cursor = conn.cursor()
-cursor.execute("INSERT INTO usuarios (nome, senha_hash) VALUES (%s, %s)", (nome, senha_hash))
+cursor.execute("INSERT INTO usuarios (username, senha_hash) VALUES (%s, %s)", (username, senha_hash))
 conn.commit()
 cursor.close()
 conn.close()
