@@ -358,3 +358,30 @@ def registrar_saida(
     finally:
         cursor.close()
         db.close()
+
+
+
+@app.post("/relatorios")
+def criar_relatorio(
+    titulo: str = Form(...),
+    descricao: str = Form(...),
+    data_lembrete: Optional[str] = Form(None)  # pode ser None
+):
+    db = get_db_connection()
+    cursor = db.cursor()
+    try:
+        data_criacao = datetime.now().strftime("%Y-%m-%d")  # só a data
+        sql = """
+            INSERT INTO relatorios (titulo, descricao, data_criacao, data_lembrete)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(sql, (titulo, descricao, data_criacao, data_lembrete))
+        db.commit()
+        return {"mensagem": "Relatório criado com sucesso"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro ao criar relatório: {e}")
+    finally:
+        cursor.close()
+        db.close()
+

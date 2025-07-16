@@ -36,14 +36,6 @@
   <section class="content-section">
   <h2>Relatórios</h2>
 
-  <!-- Botão de novo relatório -->
-  <div style="margin-bottom: 20px;">
-    <button onclick="abrirFormularioNovoRelatorio()" type="submit">
-      + Novo
-    </button>
-  </div>
-  
-  
   <!-- Filtros -->
   <div class="filtros">
     <div class="filtro-texto">
@@ -54,6 +46,14 @@
     <input type="date" id="filtro-lembrete" onchange="filtrarRelatorios()" />
   </div>
 
+
+  <!-- Botão de novo relatório -->
+  <div style="margin-bottom: 20px; padding-top: 10px;">
+    <button onclick="abrirFormularioNovoRelatorio()" type="submit">
+      + Novo
+    </button>
+  </div>
+  
   
   <!-- Tabela de relatórios -->
   <div class="table-container">
@@ -117,27 +117,26 @@
 
 
 
-<div id="modal-editar-relatorio" class="modal" style="display: none;">
-  <form id="form-editar-relatorio" class="modal-conteudo">
-    <input type="hidden" id="editar-relatorio-id">
+<div id="modal-novo-relatorio" class="modal" style="display: none;">
+  <form id="form-novo-relatorio" class="modal-conteudo">
+    <h3 style="margin-bottom: 1rem;">Novo Relatório</h3>
 
-    <label for="editar-titulo">Título:</label>
-    <input type="text" id="editar-titulo" required>
+    <label for="novo-titulo">Título:</label>
+    <input type="text" id="novo-titulo" required>
 
-    <label for="editar-descricao">Descrição:</label>
-    <textarea id="editar-descricao" rows="3" style="resize: vertical;"></textarea>
+    <label for="novo-descricao">Descrição:</label>
+    <textarea id="novo-descricao" rows="6" style="resize: vertical; min-height: 150px; width: 100%;" required></textarea>
 
-    <label for="editar-data-criacao">Criado em:</label>
-    <input type="date" id="editar-data-criacao" required>
-
-    <label for="editar-lembrete">Lembrete:</label>
-    <input type="date" id="editar-lembrete">
+    <label for="novo-lembrete">Lembrete (opcional):</label>
+    <input type="date" id="novo-lembrete">
 
     <div class="modal-botoes">
       <button type="submit">Salvar</button>
-      <button type="button" onclick="fecharModalRelatorio()">Cancelar</button>
+      <button type="button" onclick="fecharModalNovoRelatorio()">Cancelar</button>
     </div>
   </form>
+</div>
+
 </div>
 
 
@@ -145,5 +144,30 @@
 
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  <script>
+  function abrirFormularioNovoRelatorio() {
+    document.getElementById("modal-novo-relatorio").style.display = "flex";
+  }
+
+  function fecharModalNovoRelatorio() {
+    document.getElementById("form-novo-relatorio").reset();
+    document.getElementById("modal-novo-relatorio").style.display = "none";
+  }
+
+  document.getElementById("form-novo-relatorio").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const titulo = document.getElementById("novo-titulo").value;
+    const descricao = document.getElementById("novo-descricao").value;
+    const lembrete = document.getElementById("novo-lembrete").value;
+
+    // Aqui você pode enviar via fetch para a API (ex: POST /relatorios)
+    console.log("Novo relatório:", { titulo, descricao, lembrete });
+
+    fecharModalNovoRelatorio();
+    alert("Relatório cadastrado com sucesso! (implementação futura com API)");
+  });
+</script>
+
 </body>
 </html>
