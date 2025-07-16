@@ -33,62 +33,102 @@
   </nav>
 
   <main class="main-content">
-    <section class="content-section">
-      <h2>Relatórios de Entradas</h2>
+  <section class="content-section">
+  <h2>Relatórios</h2>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Quantidade</th>
-              <th>Data da Entrada</th>
-              <th>Observações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dados Fictícios -->
-            <tr>
-              <td>Produto A</td>
-              <td>50</td>
-              <td>2025-04-10</td>
-              <td>Entrada regular</td>
-            </tr>
-            <tr>
-              <td>Produto B</td>
-              <td>30</td>
-              <td>2025-04-12</td>
-              <td>Entrada urgente</td>
-            </tr>
-            <tr>
-              <td>Produto C</td>
-              <td>20</td>
-              <td>2025-05-01</td>
-              <td>Entrada programada</td>
-            </tr>
-            <tr>
-              <td>Produto A</td>
-              <td>100</td>
-              <td>2025-05-05</td>
-              <td>Entrada após revisão</td>
-            </tr>
-            <tr>
-              <td>Produto B</td>
-              <td>75</td>
-              <td>2025-05-06</td>
-              <td>Entrada de reposição</td>
-            </tr>
-            <tr>
-              <td>Produto C</td>
-              <td>20</td>
-              <td>2025-05-01</td>
-              <td>Entrada programada</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+  <!-- Botão de novo relatório -->
+  <div style="margin-bottom: 20px;">
+    <button onclick="abrirFormularioNovoRelatorio()" type="submit">
+      + Novo
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <div class="filtro-texto">
+      <input type="text" id="busca-relatorio" placeholder="Buscar por título" oninput="filtrarRelatorios()"/> 
+      
+    </div>
+
+    <input type="date" id="filtro-lembrete" onchange="filtrarRelatorios()" />
+  </div>
+
+  <!-- Tabela de relatórios -->
+  <div class="table-container">
+    <table id="tabela-relatorios">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Conteúdo</th>
+          <th>Criado em</th>
+          <th>Lembrete</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Exemplos estáticos só para visualização -->
+        <tr>
+          <td>1</td>
+          <td>Checagem Semanal</td>
+          <td>Verificação geral do estoque após o fim de semana</td>
+          <td>2025-07-10</td>
+          <td>2025-07-15</td>
+          <td>
+            <button onclick="abrirEditarModalRelatorio(${relatorio.id}, '${relatorio.titulo.replace(/'/g, "\\'")}', '${relatorio.descricao.replace(/'/g, "\\'")}', '${relatorio.criado_em}', '${relatorio.lembrete || ''}')">Editar</button>
+            <button onclick="excluirRelatorio(${relatorio.id})">Excluir</button>
+          </td>
+
+        </tr>
+
+        <tr>
+          <td>2</td>
+          <td>Entrada Emergencial</td>
+          <td>Adição urgente de itens para reposição imediata</td>
+          <td>2025-07-05</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Reavaliação Mensal</td>
+          <td>Análise dos produtos com baixa rotatividade</td>
+          <td>2025-07-01</td>
+          <td>2025-07-31</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
+
+
+
+<div id="modal-editar-relatorio" class="modal" style="display: none;">
+  <form id="form-editar-relatorio" class="modal-conteudo">
+    <input type="hidden" id="editar-relatorio-id">
+
+    <label for="editar-titulo">Título:</label>
+    <input type="text" id="editar-titulo" required>
+
+    <label for="editar-descricao">Descrição:</label>
+    <textarea id="editar-descricao" rows="3" style="resize: vertical;"></textarea>
+
+    <label for="editar-data-criacao">Criado em:</label>
+    <input type="date" id="editar-data-criacao" required>
+
+    <label for="editar-lembrete">Lembrete:</label>
+    <input type="date" id="editar-lembrete">
+
+    <div class="modal-botoes">
+      <button type="submit">Salvar</button>
+      <button type="button" onclick="fecharModalRelatorio()">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+
+
 
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
