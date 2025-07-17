@@ -49,7 +49,7 @@
 
   <!-- Botão de novo relatório -->
   <div style="margin-bottom: 20px; padding-top: 10px;">
-    <button onclick="abrirFormularioNovoRelatorio()" type="submit">
+    <button onclick="abrirFormularioNovoRelatorio()" type="submit" class="btn-novo-relatorio">
       + Novo
     </button>
   </div>
@@ -142,32 +142,9 @@
 
 
 
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-  <script>
-  function abrirFormularioNovoRelatorio() {
-    document.getElementById("modal-novo-relatorio").style.display = "flex";
-  }
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
-  function fecharModalNovoRelatorio() {
-    document.getElementById("form-novo-relatorio").reset();
-    document.getElementById("modal-novo-relatorio").style.display = "none";
-  }
-
-  document.getElementById("form-novo-relatorio").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const titulo = document.getElementById("novo-titulo").value;
-    const descricao = document.getElementById("novo-descricao").value;
-    const lembrete = document.getElementById("novo-lembrete").value;
-
-    // Aqui você pode enviar via fetch para a API (ex: POST /relatorios)
-    console.log("Novo relatório:", { titulo, descricao, lembrete });
-
-    fecharModalNovoRelatorio();
-    alert("Relatório cadastrado com sucesso! (implementação futura com API)");
-  });
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>

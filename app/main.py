@@ -2,7 +2,7 @@ from fastapi import FastAPI, Form, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import mysql.connector
-from datetime import datetime
+from datetime import datetime, date
 import bcrypt
 
 app = FastAPI()
@@ -361,27 +361,84 @@ def registrar_saida(
 
 
 
+
+
+
 @app.post("/relatorios")
 def criar_relatorio(
     titulo: str = Form(...),
     descricao: str = Form(...),
-    data_lembrete: Optional[str] = Form(None)  # pode ser None
+    lembrete: Optional[str] = Form(None)  # Recebe string no formato yyyy-mm-dd ou None
 ):
-    db = get_db_connection()
-    cursor = db.cursor()
     try:
-        data_criacao = datetime.now().strftime("%Y-%m-%d")  # só a data
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="1234",
+            database="almoxarifado1"
+        )
+        cursor = conn.cursor()
+
+        # Converte lembrete para date ou None
+        data_lembrete = None
+        if lembrete:
+            try:
+                data_lembrete = datetime.strptime(lembrete, "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Formato de data do lembrete inválido, use yyyy-mm-dd")
+
         sql = """
             INSERT INTO relatorios (titulo, descricao, data_criacao, data_lembrete)
             VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(sql, (titulo, descricao, data_criacao, data_lembrete))
-        db.commit()
+        hoje = date.today()
+        valores = (
+            titulo,
+            descricao,
+            hoje,
+            data_lembrete
+        )
+
+        cursor.execute(sql, valores)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
         return {"mensagem": "Relatório criado com sucesso"}
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Erro ao criar relatório: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/relatorios")
+def listar_relatorios():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY data_criacao DESC")
+        relatorios = cursor.fetchall()
+        return relatorios
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Erro ao listar relatórios: " + str(e))
     finally:
         cursor.close()
         db.close()
 
+
+@app.delete("/relatorios/{relatorio_id}")
+def excluir_relatorio(relatorio_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM relatorios WHERE id = %s", (relatorio_id,))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Relatório não encontrado")
+        db.commit()
+        return {"mensagem": "Relatório excluído com sucesso"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Erro ao excluir relatório: " + str(e))
+    finally:
+        cursor.close()
+        db.close()
