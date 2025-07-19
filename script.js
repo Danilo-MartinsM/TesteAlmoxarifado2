@@ -671,42 +671,6 @@ if (window.location.pathname.includes("cadastrarSaidas.html")) {
 }
 
 
-const formRelatorio = document.getElementById("form-relatorio");
-const mensagemRelatorio = document.getElementById("mensagem-relatorio");
-
-if (formRelatorio) {
-  formRelatorio.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(formRelatorio);
-
-    try {
-      const response = await fetch("http://localhost:8000/relatorios", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        mensagemRelatorio.textContent = data.mensagem || "Relatório criado com sucesso!";
-        mensagemRelatorio.style.color = "green";
-        formRelatorio.reset();
-        // fecha modal se quiser:
-        // document.getElementById("modal-relatorio").style.display = "none";
-      } else {
-        mensagemRelatorio.textContent = data.detail || "Erro ao criar relatório.";
-        mensagemRelatorio.style.color = "red";
-      }
-    } catch (error) {
-      mensagemRelatorio.textContent = "Erro ao conectar com o servidor.";
-      mensagemRelatorio.style.color = "red";
-      console.error(error);
-    }
-  });
-}
-
-
 
 
 
@@ -719,8 +683,8 @@ window.abrirFormularioNovoRelatorio = function() {
 };
 
 // --- RELATÓRIOS ---
-if (window.location.pathname.includes("relatorios.html")) {
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.pathname.includes("relatorios.html")) {
     const botaoNovo = document.getElementById("btn-novo-relatorio");
     const modal = document.getElementById("modal-novo-relatorio");
     const form = document.getElementById("form-novo-relatorio");
@@ -732,8 +696,9 @@ if (window.location.pathname.includes("relatorios.html")) {
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-        // Aqui faça o fetch para salvar o relatório, se quiser
+        alert("Relatório salvo com sucesso! (simulação)");
         modal.style.display = "none";
+        form.reset();
       });
 
       window.addEventListener("click", (e) => {
@@ -742,10 +707,11 @@ if (window.location.pathname.includes("relatorios.html")) {
         }
       });
     } else {
-      console.warn("Elemento(s) do modal de relatório não encontrados.");
+      console.warn("Algum elemento do modal não foi encontrado.");
     }
-  });
-}
+  }
+});
+
 
 
 
