@@ -191,34 +191,6 @@ button:hover {
   color: var(--accent);
 }
 
-/*============================
-  TABELAS
-============================*/
-.table-container {
-  margin-top: 2rem;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: var(--sidebar);
-  color: var(--white);
-}
-
-tr:hover {
-  background-color: #f1f1f1;
-}
 
 /*============================
   LOGO E INFORMAÇÕES DO USUÁRIO
@@ -359,9 +331,10 @@ tr:hover {
 }
 
 /*============================
-  TABELA DE PRODUTOS - AÇÕES
+  TABELA PADRÃO - AÇÕES E ESTILO GERAL
 ============================*/
-table#tabela-produtos td button {
+
+table.tabela-padrao td button {
   padding: 0.3rem 0.6rem;
   margin: 0 0.2rem;
   border: none;
@@ -372,35 +345,38 @@ table#tabela-produtos td button {
   transition: background-color 0.2s ease;
 }
 
-table#tabela-produtos td button:first-child {
+table.tabela-padrao td button:first-child {
   background-color: #3498db;
   color: white;
 }
 
-table#tabela-produtos td button:first-child:hover {
+table.tabela-padrao td button:first-child:hover {
   background-color: #2980b9;
 }
 
-table#tabela-produtos td button:last-child {
+table.tabela-padrao td button:last-child {
   background-color: #c0392b;
   color: white;
 }
 
-table#tabela-produtos td button:last-child:hover {
+table.tabela-padrao td button:last-child:hover {
   background-color: #922b21;
 }
 
-table#tabela-produtos td:nth-child(5) {
+/* Estilo para coluna de ações (ou qualquer quinta coluna) */
+table.tabela-padrao td:nth-child(5) {
   white-space: nowrap;
   font-size: 0.9rem;
   color: #555;
 }
 
-table#tabela-produtos td {
+/* Estilo das células */
+table.tabela-padrao td {
   padding: 0.6rem 0.8rem;
 }
 
-table#tabela-produtos thead th {
+/* Estilo do cabeçalho */
+table.tabela-padrao thead th {
   padding: 0.8rem;
   text-align: left;
   border-bottom: 2px solid #ccc;
@@ -644,42 +620,5 @@ select:disabled {
   cursor: not-allowed;
 }
 
-
-/* ============================
-   BOTÕES DE AÇÃO GENÉRICOS (EDITAR / EXCLUIR)
-============================ */
-.btn-editar {
-  background-color: #3498db;
-  color: white;
-  padding: 0.3rem 0.6rem;
-  margin: 0 0.2rem;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  transition: background-color 0.2s ease;
-}
-
-.btn-editar:hover {
-  background-color: #2980b9;
-}
-
-.btn-excluir {
-  background-color: #c0392b;
-  color: white;
-  padding: 0.3rem 0.6rem;
-  margin: 0 0.2rem;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  transition: background-color 0.2s ease;
-}
-
-.btn-excluir:hover {
-  background-color: #922b21;
-}
 
 

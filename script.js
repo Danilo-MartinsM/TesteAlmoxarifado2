@@ -738,7 +738,7 @@ function carregarRelatorios() {
   fetch("http://localhost:8000/relatorios")
     .then((res) => res.json())
     .then((data) => {
-      const tbody = document.querySelector("#tabela-produtos tbody");
+      const tbody = document.querySelector("#tabela-relatorios tbody");
       tbody.innerHTML = "";
 
       data.forEach((rel) => {
