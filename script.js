@@ -675,42 +675,105 @@ if (window.location.pathname.includes("cadastrarSaidas.html")) {
 
 
 
-window.abrirFormularioNovoRelatorio = function() {
-  const modal = document.getElementById("modal-novo-relatorio");
-  if (modal) {
-    modal.style.display = "flex";
-  }
-};
 
 // --- RELATÓRIOS ---
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.pathname.includes("relatorios.html")) {
-    const botaoNovo = document.getElementById("btn-novo-relatorio");
-    const modal = document.getElementById("modal-novo-relatorio");
-    const form = document.getElementById("form-novo-relatorio");
+function abrirModalNovoRelatorio() {
+  const modal = document.getElementById("modal-novo-relatorio");
+  if (modal) modal.style.display = "flex";
+}
 
-    if (botaoNovo && modal && form) {
-      botaoNovo.addEventListener("click", () => {
-        modal.style.display = "flex";
-      });
+function fecharModalNovoRelatorio() {
+  const modal = document.getElementById("modal-novo-relatorio");
+  if (modal) modal.style.display = "none";
+}
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        alert("Relatório salvo com sucesso! (simulação)");
-        modal.style.display = "none";
-        form.reset();
-      });
+const botaoNovoRelatorio = document.getElementById("btn-novo-relatorio");
+if (botaoNovoRelatorio) {
+  botaoNovoRelatorio.addEventListener("click", abrirModalNovoRelatorio);
+}
 
-      window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          modal.style.display = "none";
-        }
-      });
-    } else {
-      console.warn("Algum elemento do modal não foi encontrado.");
+const formNovoRelatorio = document.getElementById("form-novo-relatorio");
+if (formNovoRelatorio) {
+  formNovoRelatorio.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const titulo = document.getElementById("novo-titulo").value.trim();
+    const descricao = document.getElementById("novo-descricao").value.trim();
+    const lembrete = document.getElementById("novo-lembrete").value;
+
+    if (!titulo || !descricao) {
+      alert("Título e descrição são obrigatórios.");
+      return;
     }
-  }
+
+    const formData = new FormData();
+    formData.append("titulo", titulo);
+    formData.append("descricao", descricao);
+    formData.append("lembrete", lembrete);
+
+    try {
+      const response = await fetch("http://localhost:8000/relatorios", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.mensagem || "Relatório criado com sucesso!");
+        fecharModalNovoRelatorio();
+        formNovoRelatorio.reset();
+        carregarRelatorios();
+      } else {
+        alert(data.detail || "Erro ao criar relatório.");
+      }
+    } catch (error) {
+      console.error("Erro ao criar relatório:", error);
+      alert("Erro na comunicação com o servidor.");
+    }
+  });
+}
+
+function carregarRelatorios() {
+  fetch("http://localhost:8000/relatorios")
+    .then((res) => res.json())
+    .then((data) => {
+      const tbody = document.querySelector("#tabela-produtos tbody");
+      tbody.innerHTML = "";
+
+      data.forEach((rel) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${rel.id}</td>
+          <td>${rel.titulo}</td>
+          <td>${rel.descricao}</td>
+          <td>${rel.criado_em ? new Date(rel.criado_em).toLocaleDateString("pt-BR") : "—"}</td>
+          <td>${rel.lembrete || "—"}</td>
+          <td>
+            <button onclick="abrirEditarModalRelatorio(${rel.id}, '${rel.titulo}', '${rel.descricao}', '${rel.criado_em}', '${rel.lembrete || ""}')">Editar</button>
+            <button onclick="excluirRelatorio(${rel.id})">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch((err) => {
+      console.error("Erro ao carregar relatórios:", err);
+    });
+}
+
+function abrirEditarModalRelatorio() {
+  alert("Função de editar ainda não implementada.");
+}
+
+function excluirRelatorio(id) {
+  alert("Função de excluir ainda não implementada.");
+}
+
+window.addEventListener("load", () => {
+  carregarRelatorios();
 });
+
 
 
 

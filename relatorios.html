@@ -46,7 +46,7 @@
 
       <!-- Botão de novo relatório -->
       <div style="margin-bottom: 20px; padding-top: 10px;">
-        <button id="btn-novo-relatorio" type="button" class="btn-novo-relatorio">
+        <button id="btn-novo-relatorio" type="button">
           + Novo
         </button>
       </div>
@@ -105,26 +105,29 @@
     </section>
   </main>
 
-  <!-- Modal de novo relatório -->
-  <div id="modal-novo-relatorio" class="modal" style="display: none;">
-    <form id="form-novo-relatorio" class="modal-conteudo">
-      <h3 style="margin-bottom: 1rem;">Novo Relatório</h3>
+  
 
-      <label for="novo-titulo">Título:</label>
-      <input type="text" id="novo-titulo" required>
+ <!-- Modal criar e editar relatórios -->
+<div id="modal-novo-relatorio" class="modal" style="display:none;">
+  <form id="form-novo-relatorio" class="modal-conteudo">
+    <h3>Novo Relatório</h3>
 
-      <label for="novo-descricao">Descrição:</label>
-      <textarea id="novo-descricao" rows="6" style="resize: vertical; min-height: 150px; width: 100%;" required></textarea>
+    <label for="novo-titulo">Título:</label>
+    <input type="text" id="novo-titulo" required>
 
-      <label for="novo-lembrete">Lembrete (opcional):</label>
-      <input type="date" id="novo-lembrete">
+    <label for="novo-descricao">Descrição:</label>
+    <textarea id="novo-descricao" rows="6" required></textarea>
 
-      <div class="modal-botoes">
-        <button type="submit">Salvar</button>
-        <button type="button" onclick="fecharModalNovoRelatorio()">Cancelar</button>
-      </div>
-    </form>
-  </div>
+    <label for="novo-lembrete">Lembrete (opcional):</label>
+    <input type="date" id="novo-lembrete">
+
+    <div class="modal-botoes">
+      <button type="submit">Salvar</button>
+      <button type="button" onclick="fecharModalNovoRelatorio()">Cancelar</button>
+    </div>
+  </form>
+</div>
+
 
   <!-- Scripts -->
   <!-- Substitua esse kit FontAwesome se estiver dando erro de CORS -->
