@@ -33,118 +33,105 @@
   </nav>
 
   <main class="main-content">
-  <section class="content-section">
-  <h2>Relatórios</h2>
+    <section class="content-section">
+      <h2>Relatórios</h2>
 
-  <!-- Filtros -->
-  <div class="filtros">
-    <div class="filtro-texto">
-      <input type="text" id="busca-relatorio" placeholder="Buscar por título" oninput="filtrarRelatorios()"/> 
-      
-    </div>
-    
-    <input type="date" id="filtro-lembrete" onchange="filtrarRelatorios()" />
+      <!-- Filtros -->
+      <div class="filtros">
+        <div class="filtro-texto">
+          <input type="text" id="busca-relatorio" placeholder="Buscar por título" oninput="filtrarRelatorios()" />
+        </div>
+        <input type="date" id="filtro-lembrete" onchange="filtrarRelatorios()" />
+      </div>
+
+      <!-- Botão de novo relatório -->
+      <div style="margin-bottom: 20px; padding-top: 10px;">
+        <button id="btn-novo-relatorio" type="button" class="btn-novo-relatorio">
+          + Novo
+        </button>
+      </div>
+
+      <!-- Tabela de relatórios -->
+      <div class="table-container">
+        <table id="tabela-produtos">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Conteúdo</th>
+              <th>Criado em</th>
+              <th>Lembrete</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Exemplos estáticos só para visualização -->
+            <tr>
+              <td>1</td>
+              <td>Checagem Semanal</td>
+              <td>Verificação geral do estoque após o fim de semana</td>
+              <td>2025-07-10</td>
+              <td>2025-07-15</td>
+              <td>
+                <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
+                <button onclick="excluirRelatorio(1)">Excluir</button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Entrada Emergencial</td>
+              <td>Adição urgente de itens para reposição imediata</td>
+              <td>2025-07-05</td>
+              <td>—</td>
+              <td>
+                <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
+                <button onclick="excluirRelatorio(1)">Excluir</button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Reavaliação Mensal</td>
+              <td>Análise dos produtos com baixa rotatividade</td>
+              <td>2025-07-01</td>
+              <td>2025-07-31</td>
+              <td>
+                <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
+                <button onclick="excluirRelatorio(1)">Excluir</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de novo relatório -->
+  <div id="modal-novo-relatorio" class="modal" style="display: none;">
+    <form id="form-novo-relatorio" class="modal-conteudo">
+      <h3 style="margin-bottom: 1rem;">Novo Relatório</h3>
+
+      <label for="novo-titulo">Título:</label>
+      <input type="text" id="novo-titulo" required>
+
+      <label for="novo-descricao">Descrição:</label>
+      <textarea id="novo-descricao" rows="6" style="resize: vertical; min-height: 150px; width: 100%;" required></textarea>
+
+      <label for="novo-lembrete">Lembrete (opcional):</label>
+      <input type="date" id="novo-lembrete">
+
+      <div class="modal-botoes">
+        <button type="submit">Salvar</button>
+        <button type="button" onclick="fecharModalNovoRelatorio()">Cancelar</button>
+      </div>
+    </form>
   </div>
 
+  <!-- Scripts -->
+  <!-- Substitua esse kit FontAwesome se estiver dando erro de CORS -->
+  <!-- <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <!-- Botão de novo relatório -->
-  <div style="margin-bottom: 20px; padding-top: 10px;">
-    <button onclick="abrirFormularioNovoRelatorio()" type="submit" class="btn-novo-relatorio">
-      + Novo
-    </button>
-  </div>
-  
-  
-  <!-- Tabela de relatórios -->
-  <div class="table-container">
-    <table id="tabela-produtos">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Conteúdo</th>
-          <th>Criado em</th>
-          <th>Lembrete</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <!-- Exemplos estáticos só para visualização -->
-        <tr>
-          <td>1</td>
-          <td>Checagem Semanal</td>
-          <td>Verificação geral do estoque após o fim de semana</td>
-          <td>2025-07-10</td>
-          <td>2025-07-15</td>
-          <td>
-            <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
-            <button onclick="excluirRelatorio(1)">Excluir</button>
-          </td>
-
-
-
-
-        </tr>
-
-        <tr>
-          <td>2</td>
-          <td>Entrada Emergencial</td>
-          <td>Adição urgente de itens para reposição imediata</td>
-          <td>2025-07-05</td>
-          <td>—</td>
-          <td>
-            <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
-            <button onclick="excluirRelatorio(1)">Excluir</button>
-          </td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Reavaliação Mensal</td>
-          <td>Análise dos produtos com baixa rotatividade</td>
-          <td>2025-07-01</td>
-          <td>2025-07-31</td>
-          <td>
-            <button onclick="abrirEditarModalRelatorio(1, 'Relatório Semanal', 'Resumo de movimentações', '2025-07-16 14:30', '')">Editar</button>
-            <button onclick="excluirRelatorio(1)">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-</main>
-
-
-
-<div id="modal-novo-relatorio" class="modal" style="display: none;">
-  <form id="form-novo-relatorio" class="modal-conteudo">
-    <h3 style="margin-bottom: 1rem;">Novo Relatório</h3>
-
-    <label for="novo-titulo">Título:</label>
-    <input type="text" id="novo-titulo" required>
-
-    <label for="novo-descricao">Descrição:</label>
-    <textarea id="novo-descricao" rows="6" style="resize: vertical; min-height: 150px; width: 100%;" required></textarea>
-
-    <label for="novo-lembrete">Lembrete (opcional):</label>
-    <input type="date" id="novo-lembrete">
-
-    <div class="modal-botoes">
-      <button type="submit">Salvar</button>
-      <button type="button" onclick="fecharModalNovoRelatorio()">Cancelar</button>
-    </div>
-  </form>
-</div>
-
-</div>
-
-
-
-
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-
-<script src="script.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

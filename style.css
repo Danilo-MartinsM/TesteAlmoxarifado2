@@ -413,7 +413,6 @@ table#tabela-produtos thead th {
   MODAL
 ============================*/
 .modal {
-  display: none;
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
@@ -682,3 +681,5 @@ select:disabled {
 .btn-excluir:hover {
   background-color: #922b21;
 }
+
+

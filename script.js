@@ -710,129 +710,45 @@ if (formRelatorio) {
 
 
 
-// Só roda se estiver na página relatorios.html
-if (window.location.pathname.includes("relatorios.html")) {
 
+window.abrirFormularioNovoRelatorio = function() {
   const modal = document.getElementById("modal-novo-relatorio");
-  const form = document.getElementById("form-novo-relatorio");
-  const tabela = document.querySelector("#tabela-produtos tbody");
-  const btnNovo = document.querySelector(".btn-novo-relatorio");
-
-  // Função para abrir o modal do novo relatório
-  window.abrirFormularioNovoRelatorio = function() {
+  if (modal) {
     modal.style.display = "flex";
   }
+};
 
-  // Função para fechar o modal
-  window.fecharModalNovoRelatorio = function() {
-    form.reset();
-    modal.style.display = "none";
-  }
+// --- RELATÓRIOS ---
+if (window.location.pathname.includes("relatorios.html")) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const botaoNovo = document.getElementById("btn-novo-relatorio");
+    const modal = document.getElementById("modal-novo-relatorio");
+    const form = document.getElementById("form-novo-relatorio");
 
-  // Função para listar relatórios na tabela
-  function carregarRelatorios() {
-    fetch("http://localhost:8000/relatorios")
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao buscar relatórios");
-        return res.json();
-      })
-      .then(data => {
-        tabela.innerHTML = ""; // limpa tabela
-        data.forEach(rel => {
-          const tr = document.createElement("tr");
-
-          // Formatando datas (data_criacao e data_lembrete)
-          const dataCriacao = rel.data_criacao ? rel.data_criacao.split("T")[0] : "";
-          const dataLembrete = rel.data_lembrete ? rel.data_lembrete.split("T")[0] : "—";
-
-          tr.innerHTML = `
-            <td>${rel.id}</td>
-            <td>${rel.titulo}</td>
-            <td>${rel.descricao}</td>
-            <td>${dataCriacao}</td>
-            <td>${dataLembrete}</td>
-            <td>
-              <button onclick="excluirRelatorio(${rel.id})">Excluir</button>
-            </td>
-          `;
-
-          tabela.appendChild(tr);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Erro ao carregar relatórios.");
+    if (botaoNovo && modal && form) {
+      botaoNovo.addEventListener("click", () => {
+        modal.style.display = "flex";
       });
-  }
 
-  // Função para excluir relatório
-  window.excluirRelatorio = function(id) {
-    if (!confirm("Tem certeza que deseja excluir este relatório?")) return;
-
-    fetch(`http://localhost:8000/relatorios/${id}`, {
-      method: "DELETE"
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao excluir relatório");
-        return res.json();
-      })
-      .then(() => {
-        alert("Relatório excluído com sucesso");
-        carregarRelatorios();
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Erro ao excluir relatório.");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        // Aqui faça o fetch para salvar o relatório, se quiser
+        modal.style.display = "none";
       });
-  }
 
-  // Eventos
-
-  btnNovo.addEventListener("click", () => {
-    abrirFormularioNovoRelatorio();
-  });
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-
-    const titulo = document.getElementById("novo-titulo").value.trim();
-    const descricao = document.getElementById("novo-descricao").value.trim();
-    const lembrete = document.getElementById("novo-lembrete").value || null;
-
-    fetch("http://localhost:8000/relatorios", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        titulo: titulo,
-        descricao: descricao,
-        lembrete: lembrete
-      })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao salvar relatório");
-        return res.json();
-      })
-      .then(() => {
-        alert("Relatório salvo com sucesso!");
-        form.reset();
-        fecharModalNovoRelatorio();
-        carregarRelatorios();
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Erro ao salvar relatório.");
+      window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.style.display = "none";
+        }
       });
-  });
-
-  // Fecha modal se clicar fora do conteúdo
-  window.addEventListener("click", e => {
-    if (e.target === modal) {
-      fecharModalNovoRelatorio();
+    } else {
+      console.warn("Elemento(s) do modal de relatório não encontrados.");
     }
   });
-
-  // Carrega os relatórios assim que abrir a página
-  carregarRelatorios();
 }
+
+
+
+
+
+
