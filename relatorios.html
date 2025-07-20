@@ -31,11 +31,17 @@
     <a href="configuracoes.html">Configurações</a>
     <a href="ajuda.html">Ajuda</a>
   </nav>
-
+  
   <main class="main-content">
     <section class="content-section">
-      <h2>Relatórios</h2>
-
+      <h2>Relatórios</h2>  
+      
+      <!-- Botão de novo relatório -->
+      <div style="margin-bottom: 20px; padding-top: 10px;">
+        <button id="btn-novo-relatorio" type="button">
+          + Novo
+        </button>
+      </div>
       <!-- Filtros -->
       <div class="filtros">
         <div class="filtro-texto">
@@ -43,13 +49,8 @@
         </div>
         <input type="date" id="filtro-lembrete" onchange="filtrarRelatorios()" />
       </div>
-
-      <!-- Botão de novo relatório -->
-      <div style="margin-bottom: 20px; padding-top: 10px;">
-        <button id="btn-novo-relatorio" type="button">
-          + Novo
-        </button>
-      </div>
+      
+      
 
       <!-- Tabela de relatórios -->
       <div class="table-container">
@@ -82,7 +83,7 @@
     <input type="text" id="novo-titulo" required>
 
     <label for="novo-descricao">Descrição:</label>
-    <textarea id="novo-descricao" rows="6" required></textarea>
+    <textarea id="novo-descricao" rows="15" style="width: 100%; resize: none;" required></textarea>
 
     <label for="novo-lembrete">Lembrete (opcional):</label>
     <input type="date" id="novo-lembrete">

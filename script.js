@@ -734,6 +734,18 @@ if (formNovoRelatorio) {
   });
 }
 
+
+
+
+
+
+
+
+function limitarTexto(texto, limite) {
+  if (!texto) return "—";
+  return texto.length > limite ? texto.slice(0, limite) + "..." : texto;
+}
+
 function carregarRelatorios() {
   fetch("http://localhost:8000/relatorios")
     .then((res) => res.json())
@@ -745,12 +757,12 @@ function carregarRelatorios() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${rel.id}</td>
-          <td>${rel.titulo}</td>
-          <td>${rel.descricao}</td>
-          <td>${rel.criado_em ? new Date(rel.criado_em).toLocaleDateString("pt-BR") : "—"}</td>
-          <td>${rel.lembrete || "—"}</td>
+          <td title="${rel.titulo}">${limitarTexto(rel.titulo, 20)}</td>
+          <td title="${rel.descricao}">${limitarTexto(rel.descricao, 70)}</td>
+          <td>${rel.data_criacao ? new Date(rel.data_criacao).toLocaleDateString("pt-BR") : "—"}</td>
+          <td>${rel.data_lembrete ? new Date(rel.data_lembrete).toLocaleDateString("pt-BR") : "—"}</td>
           <td>
-            <button onclick="abrirEditarModalRelatorio(${rel.id}, '${rel.titulo}', '${rel.descricao}', '${rel.criado_em}', '${rel.lembrete || ""}')">Editar</button>
+            <button onclick="abrirEditarModalRelatorio(${rel.id}, '${rel.titulo.replace(/'/g, "\\'")}', '${rel.descricao.replace(/'/g, "\\'")}', '${rel.data_criacao}', '${(rel.data_lembrete || "").replace(/'/g, "\\'")}')">Editar</button>
             <button onclick="excluirRelatorio(${rel.id})">Excluir</button>
           </td>
         `;
@@ -761,6 +773,7 @@ function carregarRelatorios() {
       console.error("Erro ao carregar relatórios:", err);
     });
 }
+
 
 function abrirEditarModalRelatorio() {
   alert("Função de editar ainda não implementada.");
@@ -773,6 +786,7 @@ function excluirRelatorio(id) {
 window.addEventListener("load", () => {
   carregarRelatorios();
 });
+
 
 
 
