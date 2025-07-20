@@ -80,7 +80,7 @@ if (document.getElementById("login-form")) {
       mensagem.classList.add("sucesso");
 
       setTimeout(() => {
-        window.location.href = "dashboard2.html";
+        window.location.href = "1_dashboard.html";
       }, 1000);
     } catch (error) {
       mensagem.textContent = "Erro na conexão.";
