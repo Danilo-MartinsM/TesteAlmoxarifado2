@@ -302,7 +302,11 @@ if (document.getElementById("calendar")) {
   }
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Todos os Produtos");
+  }const dataSelecionada = document.getElementById('data-atual').value;
+  if (dataSelecionada) {
+    url += `&data=${dataSelecionada}`;
   }
+
 
   // Inicializa Select2 no filtroProduto (após carregar produtos)
   // Obs: Já chamado dentro carregarProdutosSelect, pode remover o $(document).ready desnecessário
@@ -356,6 +360,8 @@ if (document.getElementById("calendar")) {
     events: [...eventosHoje],
     dateClick: function (info) {
       const selectedDate = info.date.toISOString().split('T')[0];
+
+      // Atualiza texto exibido
       if (selectedDate === hoje) {
         dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
           day: '2-digit', month: 'long', year: 'numeric'
@@ -365,12 +371,20 @@ if (document.getElementById("calendar")) {
           day: '2-digit', month: 'long', year: 'numeric'
         });
       }
+
+      // Marca visual no calendário
       document.querySelectorAll('.fc-day').forEach(day => {
         day.classList.remove('fc-day-selected');
       });
-
       info.dayEl.classList.add('fc-day-selected');
+
+      // Atualiza o valor no campo oculto para uso nos filtros
+      document.getElementById('data-atual').value = selectedDate;
+
+      // Chama a função que atualiza a tabela com os filtros
+      buscarMovimentacoes(); // use aqui o nome da sua função real
     }
+
   });
 
   calendar.render();

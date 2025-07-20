@@ -340,6 +340,10 @@ input[type="date"] {
   border-radius: 4px;
 }
 
+input[type="number"] {
+  width: 5px;
+}
+
 #autocompleteList {
   position: absolute;
   top: 100%;

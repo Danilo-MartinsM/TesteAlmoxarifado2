@@ -234,7 +234,8 @@ def login(username: str = Form(...), senha: str = Form(...)):
 @app.get("/movimentacoes")
 def listar_movimentacoes(
     produto_id: Optional[int] = Query(None),
-    categoria_id: Optional[int] = Query(None)
+    categoria_id: Optional[int] = Query(None),
+    data: Optional[str] = Query(None)  # ← filtro por data
 ):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -253,6 +254,9 @@ def listar_movimentacoes(
         if categoria_id:
             sql += " AND p.id_categoria = %s"
             params.append(categoria_id)
+        if data:
+            sql += " AND DATE(m.data_alteracao) = %s"
+            params.append(data)
 
         sql += " ORDER BY m.data_alteracao DESC"
 
