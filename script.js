@@ -182,7 +182,7 @@ if (document.getElementById("tabela-produtos")) {
             <td>${produto.ultima_alteracao ? new Date(produto.ultima_alteracao).toLocaleString("pt-BR") : '—'}</td>
             <td>
               <button onclick="abrirEditarModal(${produto.id}, '${produto.nome}', '${produto.id_categoria || ''}')">Editar</button>
-              <button onclick="excluirProduto(${produto.id})">Excluir</button>
+              <button onclick="confirmarExclusaoProduto(${produto.id})">Excluir</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -254,31 +254,33 @@ if (document.getElementById("tabela-produtos")) {
     })
       .then(res => res.json())
       .then(data => {
-        alert(data.mensagem);
+        showToast(data.mensagem || "Produto editado com sucesso!", "success");
         fecharModal();
         carregarProdutos();
       })
       .catch(err => {
         console.error("Erro ao editar produto:", err);
-        alert("Erro ao editar produto");
+        showToast("Erro ao editar produto", "error");
       });
+
   });
 
   function excluirProduto(id) {
-    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    confirmarExclusaoProduto(id);
 
     fetch(`http://localhost:8000/produtos/${id}`, {
       method: "DELETE"
     })
       .then(res => res.json())
       .then(data => {
-        alert(data.mensagem);
+        showToast(data.mensagem || "Produto excluído com sucesso!", "success");
         carregarProdutos();
       })
       .catch(err => {
         console.error("Erro ao excluir produto:", err);
-        alert("Erro ao excluir produto");
+        showToast("Erro ao excluir produto", "error");
       });
+
   }
 
   // Inicialização da página de estoque
@@ -302,11 +304,7 @@ if (document.getElementById("calendar")) {
   }
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Todos os Produtos");
-  }const dataSelecionada = document.getElementById('data-atual').value;
-  if (dataSelecionada) {
-    url += `&data=${dataSelecionada}`;
   }
-
 
   // Inicializa Select2 no filtroProduto (após carregar produtos)
   // Obs: Já chamado dentro carregarProdutosSelect, pode remover o $(document).ready desnecessário
@@ -360,8 +358,6 @@ if (document.getElementById("calendar")) {
     events: [...eventosHoje],
     dateClick: function (info) {
       const selectedDate = info.date.toISOString().split('T')[0];
-
-      // Atualiza texto exibido
       if (selectedDate === hoje) {
         dataAtualEl.textContent = 'Hoje: ' + info.date.toLocaleDateString('pt-BR', {
           day: '2-digit', month: 'long', year: 'numeric'
@@ -371,21 +367,12 @@ if (document.getElementById("calendar")) {
           day: '2-digit', month: 'long', year: 'numeric'
         });
       }
-        document.getElementById('data-filtrada').value = selectedDate; // YYYY-MM-DD
-        buscarMovimentacoes(); // Atualiza a tabela filtrando
-      // Marca visual no calendário
       document.querySelectorAll('.fc-day').forEach(day => {
         day.classList.remove('fc-day-selected');
       });
+
       info.dayEl.classList.add('fc-day-selected');
-
-      // Atualiza o valor no campo oculto para uso nos filtros
-      document.getElementById('data-atual').value = selectedDate;
-
-      // Chama a função que atualiza a tabela com os filtros
-      buscarMovimentacoes(); // use aqui o nome da sua função real
     }
-
   });
 
   calendar.render();
@@ -476,18 +463,21 @@ function showToast(message, type = "success") {
   toast.classList.add("toast", type);
   toast.textContent = message;
 
+  // Remove o toast ao clicar
+  toast.addEventListener("click", () => {
+    toast.style.animation = "fadeOut 0.5s forwards";
+    setTimeout(() => toast.remove(), 500);
+  });
+
   container.appendChild(toast);
-  carregarMovimentacoes();
 
-  // Remove o toast depois de 3 segundos
+  // Inicia animação fadeOut após 2.5 segundos e remove após 3 segundos
   setTimeout(() => {
-    toast.remove();
-  }, 3000);
+    toast.style.animation = "fadeOut 0.5s forwards";
+    setTimeout(() => toast.remove(), 500);
+  }, 2500);
 }
 
-if (document.querySelector(".movimentacao-list")) {
-  carregarMovimentacoes();
-}
 
 
 // --- CADASTRAR ENTRADAS ---
@@ -522,6 +512,9 @@ if (window.location.pathname.includes("cadastrarEntradas.html")) {
     if (dataInput) dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
   }
 
+  
+  
+  
   // Carrega os produtos no select com Select2
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Selecione um produto");
@@ -623,6 +616,8 @@ if (window.location.pathname.includes("cadastrarSaidas.html")) {
     if (dataInput) dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
   }
 
+
+  
   // Carrega os produtos no select com Select2
   if (filtroProdutoSaida) {
     carregarProdutosSelect(filtroProdutoSaida, "Selecione um produto");
@@ -735,17 +730,18 @@ if (formNovoRelatorio) {
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.mensagem || "Relatório criado com sucesso!");
+        showToast(data.mensagem || "Relatório criado com sucesso!", "success");
         fecharModalNovoRelatorio();
         formNovoRelatorio.reset();
         carregarRelatorios();
       } else {
-        alert(data.detail || "Erro ao criar relatório.");
+        showToast(data.detail || "Erro ao criar relatório.", "error");
       }
-    } catch (error) {
-      console.error("Erro ao criar relatório:", error);
-      alert("Erro na comunicação com o servidor.");
-    }
+      } catch (error) {
+        console.error("Erro ao criar relatório:", error);
+        showToast("Erro na comunicação com o servidor.", "error");
+      }
+
   });
 }
 
@@ -807,6 +803,25 @@ window.addEventListener("load", () => {
 
 
 
+let idProdutoParaExcluir = null;
+
+function confirmarExclusaoProduto(id) {
+  idProdutoParaExcluir = id;
+  const modal = document.getElementById("modal-confirmar-exclusao");
+  modal.style.display = "flex";
+}
+
+function fecharModalConfirmacao() {
+  document.getElementById("modal-confirmar-exclusao").style.display = "none";
+  idProdutoParaExcluir = null;
+}
+
+document.getElementById("btn-confirmar-exclusao").addEventListener("click", () => {
+  if (idProdutoParaExcluir !== null) {
+    excluirProduto(idProdutoParaExcluir);
+    fecharModalConfirmacao();
+  }
+});
 
 
 

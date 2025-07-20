@@ -120,20 +120,26 @@ def excluir_produto(produto_id: int):
     cursor = db.cursor()
 
     try:
+        # Excluir movimentações relacionadas
+        cursor.execute("DELETE FROM movimentacoes WHERE id_produto = %s", (produto_id,))
+        # Excluir o produto
         cursor.execute("DELETE FROM produtos WHERE id = %s", (produto_id,))
+        
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Produto não encontrado")
 
         db.commit()
-        return {"mensagem": "Produto excluído com sucesso!"}
+        return {"mensagem": "Produto e movimentações excluídos com sucesso!"}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
+        print("Erro detalhado:", e)
         raise HTTPException(status_code=500, detail="Erro ao excluir produto: " + str(e))
     finally:
         cursor.close()
         db.close()
+
 
 @app.get("/produtos")
 def listar_produtos(
