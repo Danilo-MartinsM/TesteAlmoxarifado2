@@ -371,7 +371,8 @@ if (document.getElementById("calendar")) {
           day: '2-digit', month: 'long', year: 'numeric'
         });
       }
-
+        document.getElementById('data-filtrada').value = selectedDate; // YYYY-MM-DD
+        buscarMovimentacoes(); // Atualiza a tabela filtrando
       // Marca visual no calendário
       document.querySelectorAll('.fc-day').forEach(day => {
         day.classList.remove('fc-day-selected');
