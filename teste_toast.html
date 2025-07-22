@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Teste Toast</title>
+<style>
+  #toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+  }
+  .toast {
+    padding: 12px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
+    cursor: pointer;
+  }
+  .toast.success { background-color: #28a745; }
+  .toast.error { background-color: #dc3545; }
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="toast-container"></div>
+  <button onclick="showToast('Sucesso!', 'success')">Show Success Toast</button>
+  <button onclick="showToast('Erro!', 'error')">Show Error Toast</button>
+
+  <script>
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      if (!container) return;
+
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.textContent = message;
+
+      container.appendChild(toast);
+
+      void toast.offsetWidth;
+
+      setTimeout(() => {
+        toast.style.animation = "fadeOut 0.5s forwards";
+        setTimeout(() => toast.remove(), 500);
+      }, 2500);
+
+      toast.addEventListener("click", () => {
+        toast.remove();
+      });
+    }
+  </script>
+</body>
+</html>

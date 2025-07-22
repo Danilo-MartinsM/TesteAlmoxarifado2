@@ -95,7 +95,6 @@ if (document.getElementById("login-form")) {
 if (document.getElementById("form-cadastro")) {
   const form = document.getElementById("form-cadastro");
   const categoriaSelect = document.getElementById("categoriaProduto");
-  const mensagem = document.getElementById("mensagem");
 
   // Preenche o campo dataAlteracao com a data atual no formato correto
   const dataInput = document.getElementById("dataAlteracao");
@@ -131,16 +130,14 @@ if (document.getElementById("form-cadastro")) {
 
       const data = await response.json();
       if (response.ok) {
-        mensagem.textContent = data.mensagem;
-        mensagem.style.color = "green";
+        showToast(data.mensagem || "Produto cadastrado com sucesso!", "success");
         form.reset();
       } else {
-        mensagem.textContent = data.detail || "Erro ao cadastrar.";
-        mensagem.style.color = "red";
+        showToast(data.detail || "Erro ao cadastrar.", "error");
       }
+
     } catch (err) {
-      mensagem.textContent = "Erro ao conectar com o servidor.";
-      mensagem.style.color = "red";
+      showToast("Erro ao conectar com o servidor.", "error");
     }
   });
 }

@@ -617,25 +617,6 @@ table.tabela-padrao thead th {
   }
 }
 
-.toast.confirm {
-  background-color: #ffc107; /* amarelo - tipo warning */
-  color: #000;
-}
-
-.toast.confirm button {
-  margin-left: 10px;
-  background: #fff;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.toast.confirm button:hover {
-  background: #eee;
-}
-
 
 
 /*============================
