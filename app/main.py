@@ -399,7 +399,7 @@ def criar_relatorio(
 
         sql = """
             INSERT INTO relatorios (titulo, descricao, data_criacao, data_lembrete)
-            VALUES (%s, %s, %s, %s)
+            VALUES (Upper(%s), Upper(%s), %s, %s)
         """
         hoje = date.today()
         valores = (
@@ -452,3 +452,19 @@ def excluir_relatorio(relatorio_id: int):
     finally:
         cursor.close()
         db.close()
+
+
+# Pegar os relatórios com lembrete
+@app.get("/relatorios-com-lembrete")
+def get_relatorios_com_lembrete():
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute("SELECT titulo, data_lembrete FROM relatorios WHERE data_lembrete IS NOT NULL")
+        resultados = cursor.fetchall()
+        return resultados
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
