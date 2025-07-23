@@ -536,98 +536,78 @@ if (window.location.pathname.includes("cadastrarEntradas.html")) {
   const filtroProduto = document.getElementById("filtroProduto");
   const formEntrada = document.querySelector("form");
   const dataInput = document.getElementById("dataAlteracao");
-  
-  // <div id="mensagem" style="display:none; margin-top:10px; font-weight:bold;"></div>
-  const mensagem = document.getElementById("mensagem");
-  
-  // Função para mostrar mensagens
-  function mostrarMensagem(texto, tipo = "erro") {
-    if (!mensagem) return;
-    mensagem.textContent = texto;
-    mensagem.className = tipo; // "erro" ou "sucesso"
-    mensagem.style.display = "block";
-    
-    setTimeout(() => {
-      mensagem.style.display = "none";
-    }, 4000);
-  }
-  
+
   // Atualiza campo data/hora para horário atual formatado
   function atualizarDataAtual() {
     const agora = new Date();
     const ano = agora.getFullYear();
-    const mes = String(agora.getMonth() + 1).padStart(2, '0');
-    const dia = String(agora.getDate()).padStart(2, '0');
-    const horas = String(agora.getHours()).padStart(2, '0');
-    const minutos = String(agora.getMinutes()).padStart(2, '0');
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+    const horas = String(agora.getHours()).padStart(2, "0");
+    const minutos = String(agora.getMinutes()).padStart(2, "0");
     if (dataInput) dataInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
   }
-  
-  
-  
-  
-  // Carrega os produtos no select com Select2
+
   if (filtroProduto) {
     carregarProdutosSelect(filtroProduto, "Selecione um produto");
   }
-  
+
   if (dataInput) {
     atualizarDataAtual();
   }
-  
+
   if (formEntrada) {
     formEntrada.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+
       const id_produto = filtroProduto?.value;
       const quantidadeStr = document.getElementById("quantidadeEntrada")?.value;
       const data_alteracao = dataInput?.value;
-      
-      // Validações
+
+      // Validações simples
       if (!id_produto) {
-        mostrarMensagem("Por favor, selecione um produto.", "erro");
+        showToast("Por favor, selecione um produto.", "error");
         return;
       }
-      
+
       const quantidade = Number(quantidadeStr);
       if (!quantidade || quantidade <= 0 || !Number.isInteger(quantidade)) {
-        mostrarMensagem("Informe uma quantidade válida (inteiro maior que zero).", "erro");
+        showToast("Informe uma quantidade válida (inteiro maior que zero).", "error");
         return;
       }
-      
+
       if (!data_alteracao) {
-        mostrarMensagem("Informe a data da entrada.", "erro");
+        showToast("Informe a data da entrada.", "error");
         return;
       }
-      
+
       const formData = new FormData();
       formData.append("id_produto", id_produto);
       formData.append("quantidade", quantidade);
       formData.append("data_alteracao", data_alteracao);
-      
+
       try {
         const response = await fetch("http://localhost:8000/entradas", {
           method: "POST",
           body: formData,
         });
-        
+
         const result = await response.json();
-        
+
         if (response.ok) {
-          mostrarMensagem(result.mensagem || "Entrada registrada com sucesso.", "sucesso");
+          showToast(result.mensagem || "Entrada registrada com sucesso.", "success");
           formEntrada.reset();
           atualizarDataAtual();
         } else {
-          mostrarMensagem(result.detail || "Erro ao registrar entrada.", "erro");
+          showToast(result.detail || "Erro ao registrar entrada.", "error");
         }
       } catch (error) {
         console.error("Erro ao enviar entrada:", error);
-        mostrarMensagem("Erro ao conectar com o servidor.", "erro");
+        showToast("Erro ao conectar com o servidor.", "error");
       }
     });
   }
 }
-
 
 
 
