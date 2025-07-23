@@ -467,4 +467,5 @@ def get_relatorios_com_lembrete():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
-        conn.close()
+        db.close()
+

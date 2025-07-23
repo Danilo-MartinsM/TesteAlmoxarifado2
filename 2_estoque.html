@@ -7,6 +7,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css" />
   <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon"/>
+
+
+  <!-- jQuery (requerido para Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
   <header>
@@ -37,11 +47,11 @@
 
       <div class="filtros">
         <div class="filtro-texto">
-          <input type="text" id="busca" placeholder="Buscar por nome" oninput="carregarProdutos()" />
+          <input type="text" id="busca" placeholder="Buscar por nome" oninput="carregarProdutos()" style="height: 38px;"/>
           <ul id="autocompleteList"></ul>
         </div>
 
-        <select id="filtro-categoria" onchange="carregarProdutos()"style="width: 200px;">
+        <select id="filtroCategoria">
           <option value="">Todas as Categorias</option>
         </select>
 
@@ -100,9 +110,8 @@
   </div>
 
 
+  <div id="toast-container"></div>
 
-
-<div id="toast-container"></div>
   <script src="script.js"></script>
 </body>
 </html>

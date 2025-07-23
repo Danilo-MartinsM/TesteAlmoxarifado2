@@ -536,39 +536,54 @@ table.tabela-padrao thead th {
 }
 
 /*============================
-  SELECT2
+  SELECT2 CORRIGIDO
 ============================*/
-.select2-container .select2-selection--single {
-  height: 38px;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  color: #333;
+.select2-container--default .select2-selection--single {
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 12px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  background-color: white !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  box-sizing: border-box !important;
 }
 
+/* Corrige a borda ao focar */
 .select2-container--default.select2-container--focus .select2-selection--single {
-  border-color: #008080;
-  box-shadow: none;
+  border-color: #008080 !important;
+  box-shadow: none !important;
 }
 
+/* Corrige a seta */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px !important;
+  top: 0 !important;
+  right: 6px !important;
+}
+
+/* Lista de opções */
 .select2-container--default .select2-results > .select2-results__options {
   max-height: 200px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
 }
 
+/* Estilo das opções */
 .select2-container--default .select2-results__option {
   padding: 8px 12px;
   cursor: pointer;
 }
 
+/* Hover na opção */
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
   background-color: #008080;
   color: white;
 }
+
 
 /*============================
   TOAST CONTAINER

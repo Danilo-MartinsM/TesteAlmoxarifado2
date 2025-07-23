@@ -9,10 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('select[id^="filtroCategoria"]').forEach(select => {
     carregarCategoriasSelect(select, "Todas as Categorias");
   });
-
-  // Aplica select2 aos filtros (apenas após o DOM estar carregado)
-  $('#filtroProduto').select2();
-  $('#filtroCategoria').select2();
+  
 });
 
 // --- Funções auxiliares ---
@@ -190,7 +187,7 @@ function carregarCategoriasSelect(selectElement, textoPadrao = "Todas as Categor
     
     function carregarProdutos() {
       const busca = document.getElementById("busca")?.value || "";
-      const categoria = document.getElementById("filtro-categoria").value;
+      const categoria = document.getElementById("filtroCategoria").value;
       const dataFiltro = document.getElementById("filtro-data").value;
       
       let url = `http://localhost:8000/produtos?order_by=${ordemAtual.coluna}&order_dir=${ordemAtual.direcao}&busca=${encodeURIComponent(busca)}`;
@@ -317,10 +314,14 @@ function carregarCategoriasSelect(selectElement, textoPadrao = "Todas as Categor
     
     // Inicialização da página de estoque
     window.onload = function () {
-      carregarCategorias();
+      console.log("Página de estoque carregada");
+      const select = document.getElementById("filtroCategoria");
+      carregarCategoriasSelect(select);
+
       configurarOrdenacao();
       carregarProdutos();
-  };
+    };
+
 }
 
 // --- CALENDÁRIO (FullCalendar) ---
@@ -777,11 +778,6 @@ if (formNovoRelatorio) {
   }
   
   
-  
-  
-  
-  
-  
 
   function limitarTexto(texto, limite) {
     if (!texto) return "—";
@@ -829,11 +825,6 @@ window.addEventListener("load", () => {
   carregarRelatorios();
 });
 
-
-
-
-
-
 let idProdutoParaExcluir = null;
 
 function confirmarExclusaoProduto(id) {
@@ -858,4 +849,98 @@ document.getElementById("btn-confirmar-exclusao").addEventListener("click", () =
 
 
 
+function carregarCategoriasSelectSimplesComSelect2(selectId, textoPadrao = "Todas as Categorias") {
+  const selectElement = document.getElementById(selectId);
+  if (!selectElement) {
+    console.error(`Select #${selectId} não encontrado`);
+    return;
+  }
+
+  fetch("http://localhost:8000/categorias")
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP status ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      // Limpa e adiciona opção padrão
+      selectElement.innerHTML = `<option value="">${textoPadrao}</option>`;
+
+      // Cria opções
+      data.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat.id;
+        option.textContent = cat.nome;
+        selectElement.appendChild(option);
+      });
+
+      // Remove instância Select2 antiga, se houver, para evitar conflito
+      if ($(selectElement).hasClass("select2-hidden-accessible")) {
+        $(selectElement).select2('destroy');
+      }
+
+      // Inicializa Select2
+      $(selectElement).select2({
+        placeholder: textoPadrao,
+        allowClear: true,
+        width: '200px',
+        height: '38px'  // corrigido para minúsculo
+      });
+    })
+    .catch(err => {
+      console.error("Erro ao carregar categorias (Select2):", err);
+      selectElement.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
+    });
+}
+
+function carregarProdutosFiltrados() {
+  const categoriaId = document.getElementById("filtroCategoria").value;
+  const url = new URL("http://localhost:8000/produtos");
+
+  if (categoriaId) {
+    url.searchParams.append("id_categoria", categoriaId);
+  }
+
+
+  fetch(url.toString())
+    .then(res => res.json())
+    .then(produtos => {
+      atualizarTabela(produtos); // Função que atualiza a tabela na tela
+    })
+    .catch(err => console.error("Erro ao buscar produtos filtrados:", err));
+}
+
+function atualizarTabela(produtos) {
+  const tbody = document.querySelector("#tabela-produtos tbody");
+  tbody.innerHTML = ""; // limpa tabela
+
+  produtos.forEach(produto => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${produto.id}</td>
+      <td>${produto.nome}</td>
+      <td>${produto.categoria || "Sem categoria"}</td>
+      <td>${produto.quantidade_inicial}</td>
+      <td>${produto.ultima_alteracao ? new Date(produto.ultima_alteracao).toLocaleString("pt-BR") : "—"}</td>
+      <td>
+        <button onclick="abrirEditarModal(${produto.id}, '${produto.nome}', '${produto.id_categoria || ""}')">Editar</button>
+        <button onclick="confirmarExclusaoProduto(${produto.id})">Excluir</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Unifica o carregamento e escuta de eventos em um só load
+window.addEventListener("load", () => {
+  carregarCategoriasSelectSimplesComSelect2("filtroCategoria");
+
+  document.getElementById("filtroCategoria").addEventListener("change", () => {
+    carregarProdutosFiltrados();
+  });
+
+  // Carrega todos os produtos ao abrir a página
+  carregarProdutosFiltrados();
+});
 
