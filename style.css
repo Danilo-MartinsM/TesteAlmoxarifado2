@@ -334,7 +334,7 @@ tr:hover {
   border-radius: 4px;
 }
 
-input[type="date"] {
+input[type="date"], input[type="week"]{
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
