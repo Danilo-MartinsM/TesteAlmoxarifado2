@@ -698,16 +698,17 @@ if (window.location.pathname.includes("cadastrarSaidas.html")) {
         const result = await response.json();
         
         if (response.ok) {
-          mostrarMensagem(result.mensagem || "Saída registrada com sucesso.", "sucesso");
+          showToast(result.mensagem || "Saída registrada com sucesso.", "sucesso");
           formSaida.reset();
           atualizarDataAtual();
         } else {
-          mostrarMensagem(result.detail || "Erro ao registrar saída.", "erro");
+          showToast(result.detail || "Erro ao registrar saída.", "erro");
         }
       } catch (error) {
         console.error("Erro ao enviar saída:", error);
-        mostrarMensagem("Erro ao conectar com o servidor.", "erro");
+        showToast("Erro ao conectar com o servidor.", "erro");
       }
+      
     });
   }
 }
