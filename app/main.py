@@ -46,7 +46,6 @@ def criar_produto(
         else:
             data_alt = datetime.now()
 
-        # Inserir produto (nome em maiúsculas)
         sql = """
             INSERT INTO produtos (nome, quantidade_inicial, id_categoria, ultima_alteracao)
             VALUES (UPPER(%s), %s, %s, %s)
@@ -145,7 +144,7 @@ def listar_produtos(
     order_by: str = Query("id", regex="^(id|nome|categoria|quantidade_inicial|ultima_alteracao)$"),
     order_dir: str = Query("asc", regex="^(asc|desc)$"),
     busca: Optional[str] = None,
-    categoria_id: Optional[int] = Query(None),
+    categoria_id: Optional[str] = Query(None),  # <- string para permitir "" do select
     data: Optional[str] = Query(None)
 ):
     db = get_db_connection()
@@ -163,24 +162,21 @@ def listar_produtos(
     sql = """
         SELECT 
             p.id, p.nome, c.nome AS categoria, p.quantidade_inicial, p.ultima_alteracao, p.id_categoria
-        FROM 
-            produtos p
-        LEFT JOIN 
-            categorias c ON p.id_categoria = c.id
+        FROM produtos p
+        LEFT JOIN categorias c ON p.id_categoria = c.id
         WHERE 1=1
     """
     params = []
 
-    if busca:
+    if busca and busca.strip() != "":
         sql += " AND p.nome LIKE %s"
-        params.append(f"%{busca}%")
+        params.append(f"%{busca.strip()}%")
 
-    if categoria_id:
+    if categoria_id and categoria_id.strip() != "":
         sql += " AND p.id_categoria = %s"
-        params.append(categoria_id)
+        params.append(int(categoria_id))
 
-    if data:
-        # Validar formato da data (yyyy-mm-dd)
+    if data and data.strip() != "":
         try:
             datetime.strptime(data, "%Y-%m-%d")
             sql += " AND DATE(p.ultima_alteracao) = %s"
@@ -197,6 +193,7 @@ def listar_produtos(
     cursor.close()
     db.close()
     return produtos
+
 
 # --- ROTAS CATEGORIAS ---
 
