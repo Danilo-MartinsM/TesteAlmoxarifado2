@@ -464,4 +464,3 @@ def get_relatorios_com_lembrete():
     finally:
         cursor.close()
         db.close()
-

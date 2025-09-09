@@ -59,24 +59,28 @@ async function carregarCategoriasSelect(selectElement, textoTodas = "Todas as Ca
 // ==========================
 // Login
 // ==========================
-if (document.getElementById("form-login")) {
-  document.getElementById("form-login").addEventListener("submit", async e => {
+const formLogin = document.getElementById("login-form");
+if (formLogin) {
+  formLogin.addEventListener("submit", async e => {
     e.preventDefault();
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
+
+    const username = formLogin.querySelector("input[name=username]").value;
+    const senha = formLogin.querySelector("input[name=senha]").value;
 
     try {
       const response = await fetch("http://localhost:8001/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha })
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ username, senha })         
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        showToast("Login realizado com sucesso", "success");
+        showToast(data.mensagem || "Login realizado com sucesso", "success");
         setTimeout(() => window.location.href = "dashboard.html", 1000);
       } else {
-        showToast("Email ou senha incorretos", "error");
+        showToast(data.detail || "Usuário ou senha incorretos", "error");
       }
     } catch (err) {
       console.error("Erro no login:", err);
@@ -85,90 +89,132 @@ if (document.getElementById("form-login")) {
   });
 }
 
+
 // ==========================
-// Produtos
+// Estoque
 // ==========================
-async function carregarProdutos(filtros = {}) {
-  try {
-    let url = "http://localhost:8001/produtos?";
-    if (filtros.categoria) url += `categoria_id=${filtros.categoria}&`;
-    if (filtros.busca) url += `busca=${filtros.busca}&`;
+document.addEventListener("DOMContentLoaded", () => {
 
-    const response = await fetch(url);
-    const produtos = await response.json();
+  const buscaInput = document.getElementById("busca");
+  const categoriaSelect = $('#filtroCategoria'); // Select2
+  const dataInput = document.getElementById("filtro-data");
+  const tabelaBody = document.querySelector("#tabela-produtos tbody");
 
-    const tabela = document.querySelector("#tabela-produtos tbody");
-    tabela.innerHTML = "";
+  // Inicializa Select2
+  categoriaSelect.select2({
+    placeholder: "Todas as Categorias",
+    allowClear: true,
+    width: "200px"
+  });
 
-    produtos.forEach(prod => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${prod.id}</td>
-        <td>${prod.nome}</td>
-        <td>${prod.categoria}</td>
-        <td>${prod.quantidade_inicial}</td>
-        <td>${new Date(prod.ultima_alteracao).toLocaleDateString("pt-BR")}</td>
-        <td>
-          <button onclick="abrirEditarModal(${prod.id})" class="btn btn-edit">Editar</button>
-          <button onclick="confirmarExclusaoProduto(${prod.id})" class="btn btn-delete">Excluir</button>
-        </td>
-      `;
-      tabela.appendChild(tr);
-    });
-  } catch (err) {
-    console.error("Erro ao carregar produtos:", err);
-    showToast("Erro ao carregar produtos", "error");
-  }
-}
+  // Carrega categorias da API
+  fetch("http://localhost:8001/categorias")
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(cat => {
+        const option = new Option(cat.nome, cat.id, false, false);
+        categoriaSelect.append(option);
+      });
+      categoriaSelect.trigger('change');
+      atualizarTabela(); // chama só depois que categorias estão carregadas
+    })
+    .catch(err => console.error("Erro ao carregar categorias:", err));
 
-// Abrir modal de edição
-async function abrirEditarModal(idProduto) {
-  try {
-    const response = await fetch(`http://localhost:8001/produtos/${idProduto}`);
-    const produto = await response.json();
-
-    document.getElementById("editar-id").value = produto.id;
-    document.getElementById("editar-nome").value = produto.nome;
-
-    const selectEditar = document.getElementById("editar-categoria");
-    await carregarCategoriasSelect(selectEditar, "Selecione uma categoria", produto.categoria_id);
-
-    const inputQuantidade = document.getElementById("editar-quantidade");
-    if (inputQuantidade) inputQuantidade.value = produto.quantidade_inicial;
-
-    document.getElementById("modal-editar-produto").style.display = "block";
-
-  } catch (err) {
-    console.error("Erro ao abrir modal de edição:", err);
-    showToast("Erro ao abrir produto", "error");
-  }
-}
-
-// Confirmar exclusão
-function confirmarExclusaoProduto(idProduto) {
-  const modal = document.getElementById("modalConfirmacaoExclusao");
-  modal.style.display = "block";
-
-  document.getElementById("btnConfirmarExclusao").onclick = async () => {
+  // ==========================
+  // Função para carregar produtos com filtros
+  // ==========================
+  async function carregarProdutos(filtros = {}) {
     try {
-      const resp = await fetch(`http://localhost:8001/produtos/${idProduto}`, { method: "DELETE" });
-      if (resp.ok) {
-        showToast("Produto excluído com sucesso", "success");
-        carregarProdutos();
-      } else {
+      let url = "http://localhost:8001/produtos?";
+      if (filtros.categoria) url += `categoria_id=${filtros.categoria}&`;
+      if (filtros.busca) url += `busca=${encodeURIComponent(filtros.busca)}&`;
+      if (filtros.data) url += `data=${filtros.data}&`;
+
+      const response = await fetch(url);
+      const produtos = await response.json();
+
+      tabelaBody.innerHTML = "";
+
+      produtos.forEach(prod => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${prod.id}</td>
+          <td>${prod.nome}</td>
+          <td>${prod.categoria}</td>
+          <td>${prod.quantidade_inicial}</td>
+          <td>${new Date(prod.ultima_alteracao).toLocaleDateString("pt-BR")}</td>
+          <td>
+            <button onclick="abrirEditarModal(${prod.id})" class="btn btn-edit">Editar</button>
+            <button onclick="confirmarExclusaoProduto(${prod.id})" class="btn btn-delete">Excluir</button>
+          </td>
+        `;
+        tabelaBody.appendChild(tr);
+      });
+
+    } catch (err) {
+      console.error("Erro ao carregar produtos:", err);
+      showToast("Erro ao carregar produtos", "error");
+    }
+  }
+
+  // ==========================
+  // Pega filtros atuais
+  // ==========================
+  function getFiltrosAtuais() {
+    return {
+      busca: buscaInput.value || undefined,
+      categoria: categoriaSelect.val() || undefined,
+      data: dataInput.value || undefined
+    };
+  }
+
+  // ==========================
+  // Atualiza tabela usando filtros atuais
+  // ==========================
+  function atualizarTabela() {
+    carregarProdutos(getFiltrosAtuais());
+  }
+
+  // ==========================
+  // Eventos dos filtros
+  // ==========================
+  buscaInput.addEventListener("input", atualizarTabela);
+  categoriaSelect.on("change", atualizarTabela);
+  dataInput.addEventListener("change", atualizarTabela);
+
+  // ==========================
+  // Exclusão de produtos
+  // ==========================
+  window.confirmarExclusaoProduto = function(idProduto) {
+    const modal = document.getElementById("modalConfirmacaoExclusao");
+    modal.style.display = "block";
+
+    document.getElementById("btnConfirmarExclusao").onclick = async () => {
+      try {
+        const resp = await fetch(`http://localhost:8001/produtos/${idProduto}`, { method: "DELETE" });
+        const data = await resp.json(); 
+        if (resp.ok) {
+          showToast(data.mensagem || "Produto excluído com sucesso", "success");
+          atualizarTabela(); // atualiza mantendo filtros
+        } else {
+          showToast(data.detail || "Erro ao excluir produto", "error");
+        }
+      } catch (err) {
+        console.error("Erro ao excluir produto:", err);
         showToast("Erro ao excluir produto", "error");
       }
-    } catch (err) {
-      console.error("Erro ao excluir produto:", err);
-      showToast("Erro ao excluir produto", "error");
-    }
-    modal.style.display = "none";
+      modal.style.display = "none";
+    };
   };
-}
 
-function fecharModalExclusao() {
-  document.getElementById("modalConfirmacaoExclusao").style.display = "none";
-}
+  window.fecharModalExclusao = function() {
+    document.getElementById("modalConfirmacaoExclusao").style.display = "none";
+  };
+
+});
+
+
+
 
 // ==========================
 // Entradas e Saídas
@@ -179,24 +225,27 @@ function configurarFormMovimentacao(formId, selectProdutoId, rota, resetOnSucces
 
   form.addEventListener("submit", async e => {
     e.preventDefault();
-    const produto_id = selectProduto.value;
-    const quantidade = form.querySelector("input[type=number]").value;
+    const id_produto = selectProduto.value;
+    const quantidade = Number(form.querySelector("input[type=number]").value);
+    const data_alteracao = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     try {
       const response = await fetch(`http://localhost:8001/${rota}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ produto_id, quantidade })
+        body: JSON.stringify({ id_produto, quantidade, data_alteracao }) 
       });
 
+      const data = await response.json(); 
+
       if (response.ok) {
-        showToast(`${rota.charAt(0).toUpperCase() + rota.slice(1)} registrada com sucesso!`, "success");
+        showToast(data.mensagem || `${rota} registrada com sucesso!`, "success");
         if (resetOnSuccess) {
           form.reset();
           $(selectProduto).val("").trigger("change");
         }
       } else {
-        showToast(`Erro ao registrar ${rota}`, "error");
+        showToast(data.detail || `Erro ao registrar ${rota}`, "error");
       }
     } catch (err) {
       console.error(err);
@@ -217,21 +266,23 @@ if (document.getElementById("btn-novo-relatorio")) {
     e.preventDefault();
     const titulo = document.getElementById("relatorio-titulo").value;
     const descricao = document.getElementById("relatorio-descricao").value;
-    const data = document.getElementById("relatorio-data").value;
+    const lembrete = document.getElementById("relatorio-data").value;
 
     try {
       const response = await fetch("http://localhost:8001/relatorios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo, descricao, data })
+        body: JSON.stringify({ titulo, descricao, lembrete })
       });
 
+      const data = await response.json(); 
+
       if (response.ok) {
-        showToast("Relatório criado com sucesso!", "success");
+        showToast(data.mensagem || "Relatório criado com sucesso!", "success");
         document.getElementById("form-novo-relatorio").reset();
         document.getElementById("modal-novo-relatorio").style.display = "none";
       } else {
-        showToast("Erro ao criar relatório", "error");
+        showToast(data.detail || "Erro ao criar relatório", "error");
       }
     } catch (err) {
       console.error("Erro:", err);
@@ -273,9 +324,8 @@ document.addEventListener("DOMContentLoaded", () => {
     configurarFormMovimentacao("form-entrada", "produtoEntrada", "entradas");
     carregarCategoriasSelect(document.getElementById("categoriaEntrada"), "Todas as Categorias");
   }
-
+  
   if (document.getElementById("form-saida")) {
     configurarFormMovimentacao("form-saida", "produtoSaida", "saidas");
   }
 });
-``
