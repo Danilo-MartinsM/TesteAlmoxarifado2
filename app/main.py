@@ -22,10 +22,11 @@ def get_db_connection():
         user="root",
         password="1234",
         database="almoxarifado1",
-        charset='utf8mb4'
+        charset='utf8mb4'  # para evitar problemas com acentuação
     )
 
 # --- ROTAS PRODUTOS ---
+
 @app.post("/produtos")
 def criar_produto(
     nome: str = Form(...),
@@ -46,6 +47,7 @@ def criar_produto(
         else:
             data_alt = datetime.now()
 
+        # Inserir produto (nome em maiúsculas)
         sql = """
             INSERT INTO produtos (nome, quantidade_inicial, id_categoria, ultima_alteracao)
             VALUES (UPPER(%s), %s, %s, %s)
@@ -144,7 +146,7 @@ def listar_produtos(
     order_by: str = Query("id", regex="^(id|nome|categoria|quantidade_inicial|ultima_alteracao)$"),
     order_dir: str = Query("asc", regex="^(asc|desc)$"),
     busca: Optional[str] = None,
-    categoria_id: Optional[str] = Query(None),  # <- string para permitir "" do select
+    categoria_id: Optional[int] = Query(None),
     data: Optional[str] = Query(None)
 ):
     db = get_db_connection()
@@ -162,21 +164,24 @@ def listar_produtos(
     sql = """
         SELECT 
             p.id, p.nome, c.nome AS categoria, p.quantidade_inicial, p.ultima_alteracao, p.id_categoria
-        FROM produtos p
-        LEFT JOIN categorias c ON p.id_categoria = c.id
+        FROM 
+            produtos p
+        LEFT JOIN 
+            categorias c ON p.id_categoria = c.id
         WHERE 1=1
     """
     params = []
 
-    if busca and busca.strip() != "":
+    if busca:
         sql += " AND p.nome LIKE %s"
-        params.append(f"%{busca.strip()}%")
+        params.append(f"%{busca}%")
 
-    if categoria_id and categoria_id.strip() != "":
+    if categoria_id:
         sql += " AND p.id_categoria = %s"
-        params.append(int(categoria_id))
+        params.append(categoria_id)
 
-    if data and data.strip() != "":
+    if data:
+        # Validar formato da data (yyyy-mm-dd)
         try:
             datetime.strptime(data, "%Y-%m-%d")
             sql += " AND DATE(p.ultima_alteracao) = %s"
@@ -193,7 +198,6 @@ def listar_produtos(
     cursor.close()
     db.close()
     return produtos
-
 
 # --- ROTAS CATEGORIAS ---
 
@@ -420,7 +424,7 @@ def listar_relatorios():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY id asc")
+        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY data_criacao DESC")
         relatorios = cursor.fetchall()
         return relatorios
     except Exception as e:
@@ -464,3 +468,4 @@ def get_relatorios_com_lembrete():
     finally:
         cursor.close()
         db.close()
+
