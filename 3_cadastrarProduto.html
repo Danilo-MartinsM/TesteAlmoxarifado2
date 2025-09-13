@@ -9,11 +9,15 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- jQuery (requerido para Select2) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Select2 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <!-- Select2 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
 </head>
 <body>
   <header>
@@ -50,7 +54,9 @@
 
         <div class="form-group">
           <label for="categoriaProduto">Categoria</label>
-          <select id="categoriaProduto" name="categoriaProduto" required style="width: 200px;"></select>
+          <select id="categoriaProduto" name="categoriaProduto" required>
+            <option value="">Carregando categorias...</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -68,7 +74,8 @@
     </section>
   </main>
 
-  <div id="toast-container"></div>
-  <script src="script.js"></script>
+
+<div id="toast-container"></div>
+<script src="script.js"></script>
 </body>
 </html>

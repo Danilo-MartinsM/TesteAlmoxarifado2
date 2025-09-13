@@ -7,27 +7,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
   <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="style.css">
-
   <!-- jQuery (requerido para Select2) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Select2 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <!-- Select2 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <div class="logo-area">
-      <img src="imagens/logo1.png" alt="Logo naturAYO">
-      <h1>naturAYO</h1>
-    </div>
+        <img src="imagens/logo1.png" alt="Logo naturAYO">
+        <h1>naturAYO</h1>
+      </div>
     <div class="user-info">
       <img src="imagens/foto-perfil.jpg" alt="Foto do usuário">
       <span>Usuário: Danilo Martins</span>
     </div>
   </header>
-
   <nav class="sidebar">
     <a href="1_dashboard.html">Início</a>
     <a href="2_estoque.html">Estoque</a>
@@ -43,7 +43,7 @@
   <main class="main-content">
     <section class="content-section">
       <h2>Cadastrar Entradas</h2>
-      <form id="form-entradas">
+      <form>
         <div class="filter-group">
           <label for="filtroProduto">Produto</label>
           <select id="filtroProduto" name="id_produto" style="width: 100%;"></select>
@@ -66,8 +66,10 @@
 
   <div id="toast-container"></div>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="script.js"></script>
 </body>
 </html>

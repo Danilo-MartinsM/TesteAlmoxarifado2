@@ -7,13 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
   <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon" />
-
   <!-- jQuery (requerido para Select2) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Select2 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <!-- Select2 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -51,28 +52,31 @@
     
     <aside class="calendar">
       <h3>Filtros</h3>
-      <div id="data-visual"></div>
-      <input type="hidden" id="data-atual" value=""> <!-- armazenar data filtro -->
+      <div id="data-visual"></div> <!-- para mostrar a data -->
+      <input type="hidden" id="data-atual" value=""> <!-- para armazenar a data filtro -->
+
+
 
       <div class="filter-group">
         <label for="filtroProduto">Filtrar por Produto:</label>
-        <select id="filtroProduto" style="width: 100%"></select>
+        <select id="filtroProduto">
+        </select>
       </div>
   
       <div class="filter-group">
         <label for="filtroCategoria">Filtrar por Categoria:</label>
-        <select id="filtroCategoria" style="width: 100%"></select>
+        <select id="filtroCategoria">
+        </select>
       </div>
 
       <div id="calendar"></div>
     </aside>
   </main>
 
-  <!-- Toast container -->
-  <div id="toast-container"></div>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+
   <script src="script.js"></script>
 </body>
 </html>
