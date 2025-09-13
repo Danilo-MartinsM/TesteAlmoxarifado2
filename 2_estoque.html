@@ -8,19 +8,12 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon"/>
 
-
   <!-- jQuery (requerido para Select2) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
   <header>
@@ -52,15 +45,13 @@
 
       <div class="filtros">
         <div class="filtro-texto">
-          <input type="text" id="busca" placeholder="Buscar por nome" oninput="carregarProdutos()" style="height: 38px;"/>
+          <input type="text" id="busca" placeholder="Buscar por nome" style="height: 38px;"/>
           <ul id="autocompleteList"></ul>
         </div>
 
-        <select id="filtroCategoria">
-          <option value="">Todas as Categorias</option>
-        </select>
+        <select id="filtroCategoria" style="width: 200px;"></select>
 
-        <input type="date" id="filtro-data" onchange="carregarProdutos()" />
+        <input type="date" id="filtro-data"/>
       </div>
 
       <div class="table-container">
@@ -84,24 +75,23 @@
   </main>
   
   <!-- MODAL DE EDIÇÃO -->
-    <div id="modal-editar" class="modal" style="display: none;">
+  <div id="modal-editar" class="modal" style="display: none;">
     <form id="form-editar" class="modal-conteudo">
-        <input type="hidden" id="editar-id">
+      <input type="hidden" id="editar-id">
 
-        <label for="editar-nome">Nome:</label>
-        <input type="text" id="editar-nome" required>
+      <label for="editar-nome">Nome:</label>
+      <input type="text" id="editar-nome" required>
 
-        <label for="editar-categoria">Categoria:</label>
-        <select id="editar-categoria" required></select>
+      <label for="editar-categoria">Categoria:</label>
+      <select id="editar-categoria" required></select>
 
-        <div class="modal-botoes">
+      <div class="modal-botoes">
         <button type="submit">Salvar</button>
         <button type="button" onclick="fecharModal()">Cancelar</button>
-        </div>
+      </div>
     </form>
-    </div>
-
   </div>
+
   <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO --> 
   <div id="modal-confirmar-exclusao" class="modal" style="display: none;">
     <form class="modal-conteudo">
@@ -114,7 +104,7 @@
     </form>
   </div>
 
-
+  <!-- Toast container -->
   <div id="toast-container"></div>
 
   <script src="script.js"></script>

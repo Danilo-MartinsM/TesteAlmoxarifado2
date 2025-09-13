@@ -22,11 +22,10 @@ def get_db_connection():
         user="root",
         password="1234",
         database="almoxarifado1",
-        charset='utf8mb4'  # para evitar problemas com acentuação
+        charset='utf8mb4'
     )
 
 # --- ROTAS PRODUTOS ---
-
 @app.post("/produtos")
 def criar_produto(
     nome: str = Form(...),
@@ -424,7 +423,7 @@ def listar_relatorios():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY data_criacao DESC")
+        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY id asc")
         relatorios = cursor.fetchall()
         return relatorios
     except Exception as e:
