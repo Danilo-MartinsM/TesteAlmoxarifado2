@@ -7,13 +7,13 @@ import bcrypt
 
 app = FastAPI()
 
-# CORS middleware para permitir requisições do frontend
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, restringir os domínios permitidos
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 def get_db_connection():
@@ -25,7 +25,40 @@ def get_db_connection():
         charset='utf8mb4'
     )
 
-# --- ROTAS PRODUTOS ---
+# ==========================
+# Login
+# ==========================
+@app.post("/login")
+def login(username: str = Form(...), senha: str = Form(...)):
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        if not user or not bcrypt.checkpw(senha.encode(), user['senha_hash'].encode()):
+            raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        return {"mensagem": "Login realizado com sucesso!"}
+    finally:
+        cursor.close()
+        db.close()
+
+# ==========================
+# Categorias
+# ==========================
+@app.get("/categorias")
+def listar_categorias():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT id, nome FROM categorias ORDER BY nome ASC")
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        db.close()
+
+# ==========================
+# Produtos
+# ==========================
 @app.post("/produtos")
 def criar_produto(
     nome: str = Form(...),
@@ -35,39 +68,22 @@ def criar_produto(
 ):
     db = get_db_connection()
     cursor = db.cursor()
-
     try:
-        # Converter string para datetime ou usar data atual
-        if ultima_alteracao:
-            try:
-                data_alt = datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Formato de data inválido")
-        else:
-            data_alt = datetime.now()
-
-        # Inserir produto (nome em maiúsculas)
-        sql = """
-            INSERT INTO produtos (nome, quantidade_inicial, id_categoria, ultima_alteracao)
-            VALUES (UPPER(%s), %s, %s, %s)
-        """
-        valores = (nome.strip(), quantidade_inicial, id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"))
-        cursor.execute(sql, valores)
+        data_alt = datetime.now() if not ultima_alteracao else datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")
+        cursor.execute(
+            "INSERT INTO produtos (nome, quantidade_inicial, id_categoria, ultima_alteracao) VALUES (UPPER(%s), %s, %s, %s)",
+            (nome.strip(), quantidade_inicial, id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"))
+        )
         produto_id = cursor.lastrowid
-
-        # Registrar movimentação (Entrada)
-        sql_mov = """
-            INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto)
-            VALUES ('Entrada', %s, %s, %s)
-        """
-        valores_mov = (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
-        cursor.execute(sql_mov, valores_mov)
-
+        cursor.execute(
+            "INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) VALUES ('Entrada', %s, %s, %s)",
+            (quantidade_inicial, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
+        )
         db.commit()
         return {"mensagem": "Produto inserido com sucesso!"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Erro ao inserir produto: " + str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         db.close()
@@ -81,34 +97,19 @@ def atualizar_produto(
 ):
     db = get_db_connection()
     cursor = db.cursor()
-
     try:
-        if ultima_alteracao:
-            try:
-                data_alt = datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Formato de data inválido")
-        else:
-            data_alt = datetime.now()
-
-        sql = """
-            UPDATE produtos 
-            SET nome = UPPER(%s), id_categoria = %s, ultima_alteracao = %s
-            WHERE id = %s
-        """
-        valores = (nome.strip(), id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
-        cursor.execute(sql, valores)
-
+        data_alt = datetime.now() if not ultima_alteracao else datetime.strptime(ultima_alteracao, "%Y-%m-%dT%H:%M")
+        cursor.execute(
+            "UPDATE produtos SET nome=UPPER(%s), id_categoria=%s, ultima_alteracao=%s WHERE id=%s",
+            (nome.strip(), id_categoria, data_alt.strftime("%Y-%m-%d %H:%M:%S"), produto_id)
+        )
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Produto não encontrado")
-
         db.commit()
         return {"mensagem": "Produto atualizado com sucesso!"}
-    except HTTPException:
-        raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Erro ao atualizar produto: " + str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         db.close()
@@ -117,165 +118,69 @@ def atualizar_produto(
 def excluir_produto(produto_id: int):
     db = get_db_connection()
     cursor = db.cursor()
-
     try:
-        # Excluir movimentações relacionadas
         cursor.execute("DELETE FROM movimentacoes WHERE id_produto = %s", (produto_id,))
-        # Excluir o produto
         cursor.execute("DELETE FROM produtos WHERE id = %s", (produto_id,))
-        
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Produto não encontrado")
-
         db.commit()
         return {"mensagem": "Produto e movimentações excluídos com sucesso!"}
-    except HTTPException:
-        raise
     except Exception as e:
         db.rollback()
-        print("Erro detalhado:", e)
-        raise HTTPException(status_code=500, detail="Erro ao excluir produto: " + str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         db.close()
 
-
 @app.get("/produtos")
 def listar_produtos(
-    order_by: str = Query("id", regex="^(id|nome|categoria|quantidade_inicial|ultima_alteracao)$"),
-    order_dir: str = Query("asc", regex="^(asc|desc)$"),
     busca: Optional[str] = None,
+    categoria_id: Optional[int] = Query(None)
+):
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    try:
+        sql = "SELECT p.id, p.nome, c.nome AS categoria, p.quantidade_inicial, p.ultima_alteracao, p.id_categoria FROM produtos p LEFT JOIN categorias c ON p.id_categoria=c.id WHERE 1=1"
+        params = []
+        if busca:
+            sql += " AND p.nome LIKE %s"
+            params.append(f"%{busca}%")
+        if categoria_id:
+            sql += " AND p.id_categoria=%s"
+            params.append(categoria_id)
+        cursor.execute(sql, params)
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        db.close()
+
+# ==========================
+# Movimentações
+# ==========================
+@app.get("/movimentacoes")
+def listar_movimentacoes(
+    produto_id: Optional[int] = Query(None),
     categoria_id: Optional[int] = Query(None),
     data: Optional[str] = Query(None)
 ):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-
-    coluna_map = {
-        "id": "p.id",
-        "nome": "p.nome",
-        "categoria": "c.nome",
-        "quantidade_inicial": "p.quantidade_inicial",
-        "ultima_alteracao": "p.ultima_alteracao"
-    }
-    coluna = coluna_map[order_by]
-
-    sql = """
-        SELECT 
-            p.id, p.nome, c.nome AS categoria, p.quantidade_inicial, p.ultima_alteracao, p.id_categoria
-        FROM 
-            produtos p
-        LEFT JOIN 
-            categorias c ON p.id_categoria = c.id
-        WHERE 1=1
-    """
-    params = []
-
-    if busca:
-        sql += " AND p.nome LIKE %s"
-        params.append(f"%{busca}%")
-
-    if categoria_id:
-        sql += " AND p.id_categoria = %s"
-        params.append(categoria_id)
-
-    if data:
-        # Validar formato da data (yyyy-mm-dd)
-        try:
-            datetime.strptime(data, "%Y-%m-%d")
-            sql += " AND DATE(p.ultima_alteracao) = %s"
-            params.append(data)
-        except ValueError:
-            cursor.close()
-            db.close()
-            raise HTTPException(status_code=400, detail="Formato de data inválido, use yyyy-mm-dd")
-
-    sql += f" ORDER BY {coluna} {order_dir.upper()}"
-
-    cursor.execute(sql, params)
-    produtos = cursor.fetchall()
-    cursor.close()
-    db.close()
-    return produtos
-
-# --- ROTAS CATEGORIAS ---
-
-@app.get("/categorias")
-def listar_categorias():
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, nome FROM categorias ORDER BY nome ASC")
-        categorias = cursor.fetchall()
-        return categorias
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro ao buscar categorias: " + str(e))
-    finally:
-        cursor.close()
-        db.close()
-
-# --- ROTAS LOGIN ---
-
-@app.post("/login")
-def login(username: str = Form(...), senha: str = Form(...)):
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
-    try:
-        cursor.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
-        user = cursor.fetchone()
-
-        if not user or not bcrypt.checkpw(senha.encode(), user['senha_hash'].encode()):
-            raise HTTPException(status_code=401, detail="Credenciais inválidas")
-
-        return {"mensagem": "Login realizado com sucesso!"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro no login: " + str(e))
-    finally:
-        cursor.close()
-        db.close()
-
-# --- ROTAS MOVIMENTAÇÕES ---
-
-@app.get("/movimentacoes")
-def listar_movimentacoes(
-    produto_id: Optional[int] = Query(None),
-    categoria_id: Optional[int] = Query(None),
-    data: Optional[str] = Query(None)  # ← filtro por data
-):
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
-    try:
-        sql = """
-            SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, p.nome AS produto, p.id_categoria
-            FROM movimentacoes m
-            JOIN produtos p ON m.id_produto = p.id
-            WHERE 1=1
-        """
+        sql = "SELECT m.id, m.tipo, m.quantidade, m.data_alteracao, p.nome AS produto, p.id_categoria FROM movimentacoes m JOIN produtos p ON m.id_produto=p.id WHERE 1=1"
         params = []
-
-        if produto_id:
-            sql += " AND p.id = %s"
-            params.append(produto_id)
-        if categoria_id:
-            sql += " AND p.id_categoria = %s"
-            params.append(categoria_id)
-        if data:
-            sql += " AND DATE(m.data_alteracao) = %s"
-            params.append(data)
-
+        if produto_id: sql += " AND p.id=%s"; params.append(produto_id)
+        if categoria_id: sql += " AND p.id_categoria=%s"; params.append(categoria_id)
+        if data: sql += " AND DATE(m.data_alteracao)=%s"; params.append(data)
         sql += " ORDER BY m.data_alteracao DESC"
-
         cursor.execute(sql, params)
-        movimentacoes = cursor.fetchall()
-        return movimentacoes
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro ao listar movimentações: " + str(e))
+        return cursor.fetchall()
     finally:
         cursor.close()
         db.close()
 
-# --- ROTA PARA REGISTRAR ENTRADA ---
-
+# ==========================
+# Entradas
+# ==========================
 @app.post("/entradas")
 def registrar_entrada(
     id_produto: int = Form(...),
@@ -284,43 +189,31 @@ def registrar_entrada(
 ):
     db = get_db_connection()
     cursor = db.cursor()
-
     try:
-        # Validações básicas no backend (ex: quantidade > 0)
         if quantidade <= 0:
             raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
-
-        # Atualiza quantidade do produto somando a entrada
         cursor.execute(
-            "UPDATE produtos SET quantidade_inicial = quantidade_inicial + %s, ultima_alteracao = %s WHERE id = %s",
+            "UPDATE produtos SET quantidade_inicial = quantidade_inicial + %s, ultima_alteracao=%s WHERE id=%s",
             (quantidade, data_alteracao, id_produto)
         )
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-        # Registra movimentação de entrada
         cursor.execute(
-            """
-            INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto)
-            VALUES (%s, %s, %s, %s)
-            """,
-            ("Entrada", quantidade, data_alteracao, id_produto)
+            "INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) VALUES ('Entrada', %s, %s, %s)",
+            (quantidade, data_alteracao, id_produto)
         )
-
         db.commit()
         return {"mensagem": "Entrada registrada com sucesso"}
-    except HTTPException:
-        raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Erro ao registrar entrada: " + str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         db.close()
 
-
-# --- ROTA PARA REGISTRAR SAIDA ---
-
+# ==========================
+# Saídas
+# ==========================
 @app.post("/saidas")
 def registrar_saida(
     id_produto: int = Form(...),
@@ -329,38 +222,17 @@ def registrar_saida(
 ):
     db = get_db_connection()
     cursor = db.cursor()
-
     try:
-        # Verifica se o produto tem quantidade suficiente para saída
-        cursor.execute("SELECT quantidade_inicial FROM produtos WHERE id = %s", (id_produto,))
+        cursor.execute("SELECT quantidade_inicial FROM produtos WHERE id=%s", (id_produto,))
         resultado = cursor.fetchone()
         if not resultado:
             raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-        quantidade_atual = resultado[0]
-        if quantidade > quantidade_atual:
+        if quantidade > resultado[0]:
             raise HTTPException(status_code=400, detail="Quantidade insuficiente no estoque")
-
-        # Atualiza estoque subtraindo a quantidade
-        cursor.execute(
-            "UPDATE produtos SET quantidade_inicial = quantidade_inicial - %s WHERE id = %s",
-            (quantidade, id_produto)
-        )
-
-        # Registra movimentação de saída
-        cursor.execute(
-            """
-            INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto)
-            VALUES (%s, %s, %s, %s)
-            """,
-            ("Saída", quantidade, data_alteracao, id_produto)
-        )
-
+        cursor.execute("UPDATE produtos SET quantidade_inicial = quantidade_inicial - %s WHERE id=%s", (quantidade, id_produto))
+        cursor.execute("INSERT INTO movimentacoes (tipo, quantidade, data_alteracao, id_produto) VALUES ('Saída', %s, %s, %s)", (quantidade, data_alteracao, id_produto))
         db.commit()
         return {"mensagem": "Saída registrada com sucesso"}
-    except HTTPException as he:
-        db.rollback()
-        raise he
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
@@ -368,103 +240,55 @@ def registrar_saida(
         cursor.close()
         db.close()
 
-
-
-
-
-
+# ==========================
+# Relatórios
+# ==========================
 @app.post("/relatorios")
 def criar_relatorio(
     titulo: str = Form(...),
     descricao: str = Form(...),
-    lembrete: Optional[str] = Form(None)  # Recebe string no formato yyyy-mm-dd ou None
+    lembrete: Optional[str] = Form(None)
 ):
+    db = get_db_connection()
+    cursor = db.cursor()
     try:
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="1234",
-            database="almoxarifado1"
-        )
-        cursor = conn.cursor()
-
-        # Converte lembrete para date ou None
         data_lembrete = None
         if lembrete:
-            try:
-                data_lembrete = datetime.strptime(lembrete, "%Y-%m-%d").date()
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Formato de data do lembrete inválido, use yyyy-mm-dd")
-
-        sql = """
-            INSERT INTO relatorios (titulo, descricao, data_criacao, data_lembrete)
-            VALUES (Upper(%s), Upper(%s), %s, %s)
-        """
-        hoje = date.today()
-        valores = (
-            titulo,
-            descricao,
-            hoje,
-            data_lembrete
+            data_lembrete = datetime.strptime(lembrete, "%Y-%m-%d").date()
+        cursor.execute(
+            "INSERT INTO relatorios (titulo, descricao, data_criacao, data_lembrete) VALUES (UPPER(%s), UPPER(%s), %s, %s)",
+            (titulo, descricao, date.today(), data_lembrete)
         )
-
-        cursor.execute(sql, valores)
-        conn.commit()
-        cursor.close()
-        conn.close()
-
+        db.commit()
         return {"mensagem": "Relatório criado com sucesso"}
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-
+    finally:
+        cursor.close()
+        db.close()
 
 @app.get("/relatorios")
 def listar_relatorios():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY id asc")
-        relatorios = cursor.fetchall()
-        return relatorios
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro ao listar relatórios: " + str(e))
+        cursor.execute("SELECT id, titulo, descricao, data_criacao, data_lembrete FROM relatorios ORDER BY id ASC")
+        return cursor.fetchall()
     finally:
         cursor.close()
         db.close()
-
 
 @app.delete("/relatorios/{relatorio_id}")
 def excluir_relatorio(relatorio_id: int):
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM relatorios WHERE id = %s", (relatorio_id,))
+        cursor.execute("DELETE FROM relatorios WHERE id=%s", (relatorio_id,))
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Relatório não encontrado")
         db.commit()
         return {"mensagem": "Relatório excluído com sucesso"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail="Erro ao excluir relatório: " + str(e))
     finally:
         cursor.close()
         db.close()
-
-
-# Pegar os relatórios com lembrete
-@app.get("/relatorios-com-lembrete")
-def get_relatorios_com_lembrete():
-    try:
-        db = get_db_connection()
-        cursor = db.cursor()
-        cursor.execute("SELECT titulo, data_lembrete FROM relatorios WHERE data_lembrete IS NOT NULL")
-        resultados = cursor.fetchall()
-        return resultados
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        db.close()
-
